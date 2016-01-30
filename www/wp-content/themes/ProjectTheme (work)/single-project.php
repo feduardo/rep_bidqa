@@ -447,14 +447,28 @@ $rep_form_show = 'none';
 		$subject = __("Report offensive project")." : ".get_the_title();
 		
 		$message = __("This project has been reported as offensive");
-		$message .= " : <a href='".get_permalink(get_the_ID())."'>".get_the_title()."</a>"; 
+		$message .= ' : <a href="' . get_permalink(get_the_ID()) . '">' . get_the_title() . '</a>'; 
 		$message .= " <br/>Message: ".strip_tags($_POST['reason_report']); 
+        $seller_id = get_current_user_id();
+        $seller = get_user_by('id', $seller_id);
+        $message .= ' <br/>Seller: <b>' . $seller->user_login . '</b> ' .ProjectTheme_get_user_profile_link($seller->ID);
 		
 		$recipients = get_bloginfo('admin_email');
 		
 		ProjectTheme_send_email($recipients, $subject, $message);
 		
 		//------------------------
+        
+        //---- send report to project owner
+        
+//        $post = get_post(get_the_ID());
+//        $owner_id = $post->post_author;
+//        $recipients = get_user_by('id', $owner_id )->user_email;
+//		
+//		ProjectTheme_send_email($recipients, $subject, $message);
+        
+        //---------------------------------
+        
 		?>
         <div class="my_box3">
             <div class="padd10">

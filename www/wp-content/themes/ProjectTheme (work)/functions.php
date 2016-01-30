@@ -16710,9 +16710,10 @@ function ProjectTheme_send_email($recipients, $subject = '', $message = '') {
      */
     
         $wp_sys_email = get_bloginfo('admin_email');
-
-        if (strpos($recipients, $wp_sys_email) !== false) {
-            $user_admin_email = get_user_by('login', 'admin')->user_email;
+        $user_admin_email = get_user_by('login', 'admin')->user_email;
+        
+        if (strpos($recipients, $wp_sys_email) !== false && $recipients !== $user_admin_email) {
+            
             ProjectTheme_send_email($user_admin_email, $subject, $message);
         }
 
