@@ -24,8 +24,8 @@
     
     // load options for local
 
-    update_option('siteurl', 'http://bidqa.loc');
-    update_option('home', 'http://bidqa.loc');
+//    update_option('siteurl', 'http://bidqa.loc');
+//    update_option('home', 'http://bidqa.loc');
 //    update_option('siteurl', 'https://bidqa.com');
 //    update_option('home', 'https://bidqa.com');
 
@@ -7100,32 +7100,53 @@ function ProjectTheme_get_my_awarded_projects($uid)
 {
 
 	$c = "<select name='projectss' onchange='on_proj_sel();' id='my_proj_sel'><option value='0'>".__('Select','ProjectTheme')."</option>";
+//    	return $c.'</select>';
 
 	global $wpdb;
 
 	
 
-	/*$querystr = "
+//	$querystr = "
+//
+//					SELECT distinct wposts.* 
+//
+//					FROM $wpdb->posts wposts, $wpdb->postmeta wpostmeta 
+//
+//					WHERE wposts.post_author='$uid' 
+//
+//					AND  wposts.ID = wpostmeta.post_id 					
+//
+//					AND wposts.post_status = 'publish' 
+//
+//					AND wposts.post_type = 'project'
+//
+//					AND wpostmeta.meta_key = 'mark_coder_delivered' 
+//
+//					AND wpostmeta.meta_value <> '1'
+//
+//					ORDER BY wposts.post_date DESC";
 
-					SELECT distinct wposts.* 
-
-					FROM $wpdb->posts wposts, $wpdb->postmeta wpostmeta 
-
-					WHERE wposts.post_author='$uid' 
-
-					AND  wposts.ID = wpostmeta.post_id 					
-
-					AND wposts.post_status = 'publish' 
-
-					AND wposts.post_type = 'project'
-
-					AND wpostmeta.meta_key = 'mark_coder_delivered' 
-
-					AND wpostmeta.meta_value <> '1'
-
-					ORDER BY wposts.post_date DESC";*/
 
 
+//	$querystr = "
+//
+//					SELECT distinct wposts.* 
+//
+//					FROM $wpdb->posts wposts, $wpdb->postmeta wpostmeta 
+//
+//					WHERE wposts.post_author='$uid' 
+//
+//					AND  wposts.ID = wpostmeta.post_id 					
+//
+//					AND wposts.post_status = 'publish' 
+//
+//					AND wposts.post_type = 'project'
+//
+//					AND wpostmeta.meta_key = 'closed' 
+//
+//					AND wpostmeta.meta_value = '0'
+//
+//					ORDER BY wposts.post_date DESC";
 
 	$querystr = "
 
@@ -7141,7 +7162,7 @@ function ProjectTheme_get_my_awarded_projects($uid)
 
 					AND wposts.post_type = 'project'
 
-					AND wpostmeta.meta_key = 'closed' 
+					AND wpostmeta.meta_key = 'paid_user' 
 
 					AND wpostmeta.meta_value = '0'
 
@@ -7149,10 +7170,11 @@ function ProjectTheme_get_my_awarded_projects($uid)
 
 	
 
-	//echo $querystr;
+//	echo $querystr;
 
 	$r = $wpdb->get_results($querystr);
 
+//    var_dump($r);
 	
 
 	foreach($r as $row)
@@ -7165,14 +7187,14 @@ function ProjectTheme_get_my_awarded_projects($uid)
 
 		$mark_coder_delivered 	= get_post_meta($pid, 'mark_coder_delivered', true);
 
-		if($mark_coder_delivered == 1) continue;
+//		if($mark_coder_delivered == 1) continue;
 
 		if(!empty($winner))
 
 		{
 
 			$c .= '<option value="'.$row->ID.'" '.($row->ID == $_GET['poid'] ? 'selected="selected"' : '').'>'.$row->post_title.'</option>';
-
+            
 			$i = 1;
 
 		}
