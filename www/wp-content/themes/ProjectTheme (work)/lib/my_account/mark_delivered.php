@@ -39,7 +39,8 @@ if(!is_user_logged_in()) { wp_redirect(get_bloginfo('siteurl')."/wp-login.php");
 		
 		$mark_coder_delivered = get_post_meta($pid, 'mark_coder_delivered', true);
 		
-		if(empty($mark_coder_delivered)) {
+//		if(empty($mark_coder_delivered)) {
+        if($mark_coder_delivered != 1) {
 			update_post_meta($pid, 'mark_coder_delivered', "1");
 			update_post_meta($pid, 'mark_coder_delivered_date',	$tm);
 			ProjectTheme_send_email_on_delivered_project_to_bidder($pid, $uid);
