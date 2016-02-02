@@ -82,13 +82,21 @@ function ProjectTheme_my_account_disputes_area_function()
             <div class="box_content"> 
             <?php 
                 if (ProjectTheme_is_user_business($uid)) {
+//                    $querystr = "
+//                                    SELECT distinct wposts.* 
+//                                    FROM $wpdb->posts wposts, $wpdb->postmeta wpostmeta 
+//                                    WHERE wposts.post_author='$uid' 
+//                                    AND  wposts.ID = wpostmeta.post_id 
+//                                    AND wpostmeta.meta_key = 'closed' 
+//                                    AND wpostmeta.meta_value = '0' 
+//                                    AND wposts.post_status = 'publish' 
+//                                    AND wposts.post_type = 'project'
+//                                    ORDER BY wposts.post_date DESC";
                     $querystr = "
                                     SELECT distinct wposts.* 
                                     FROM $wpdb->posts wposts, $wpdb->postmeta wpostmeta 
                                     WHERE wposts.post_author='$uid' 
                                     AND  wposts.ID = wpostmeta.post_id 
-                                    AND wpostmeta.meta_key = 'closed' 
-                                    AND wpostmeta.meta_value = '0' 
                                     AND wposts.post_status = 'publish' 
                                     AND wposts.post_type = 'project'
                                     ORDER BY wposts.post_date DESC";
@@ -143,6 +151,7 @@ function ProjectTheme_my_account_disputes_area_function()
                     <input hidden name="initiator" value="<?php echo $uid; ?>">        
                     <?php //var_dump($Defendants); ?>                
                     <label>Defendant
+                            <?php if (isset($Defendants)) {?>
                         <select name="defendant">
                             <?php 
                                 foreach ($Defendants as $pid => $Defendant) {
@@ -152,7 +161,13 @@ function ProjectTheme_my_account_disputes_area_function()
                                 }
                             ?>    
                         </select>
-                    </label><br>
+                            <?php } ?>
+                    </label>
+                        <?php if (!isset($Defendants)) {
+                            echo '<p>'. __("There are no available users for disput", "ProjectTheme") . '</p>';
+                        }?>
+                        
+                    <br>
                     <label class="disput_comment">Comment
                         <textarea class="disput_comment" name="comment"></textarea>
                     </label><br>
