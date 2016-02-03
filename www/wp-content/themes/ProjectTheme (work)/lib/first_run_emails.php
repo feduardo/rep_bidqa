@@ -155,7 +155,7 @@
 		
 		update_option('ProjectTheme_priv_mess_received_email_subject', 'Your have received a private message from user: ##sender_username##.');
 		update_option('ProjectTheme_priv_mess_received_email_message', 'Hello ##receiver_username##,'.PHP_EOL.PHP_EOL.
-																				'You have received a private message from <b>##sender_username##</b>'.PHP_EOL.
+																				'You have received a private message from <b>##sender_link##</b>'.PHP_EOL.
 																				'To read it, just login to your account: ##my_account_url##'.PHP_EOL.PHP_EOL.
 																					
 																				'Thank you,'.PHP_EOL.

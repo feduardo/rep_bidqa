@@ -10145,11 +10145,26 @@ function ProjectTheme_get_user_feedback_link($uid)
 
 
 
-function ProjectTheme_get_user_profile_link($uid)
+function ProjectTheme_get_user_profile_link($uid, $named = false)
 
 {
+    if (!$named) {
 
-	return get_bloginfo('siteurl'). '/?p_action=user_profile&post_author='. $uid;	
+        return get_bloginfo('url'). '/?p_action=user_profile&post_author='. $uid;	
+
+    }else{
+        
+        $link = get_bloginfo('url'). '/?p_action=user_profile&post_author='. $uid;
+        $name = get_user_by('id', $uid)->user_login;
+        
+        $result = '<a href="' . $link . '" target="_blank">' . $name . '</a>';
+        
+//        var_dump($result);
+        
+        return $result;
+        
+    }
+	
 
 }
 
@@ -15558,7 +15573,7 @@ if($_POST['redirect_search'] == "freelancers")
 				$perm = ProjectTheme_using_permalinks();
 
 				if($perm == true)
-
+                
 				{	
 
 					wp_redirect($ProjectTheme_provider_search_page_id . "?" . $string);				
@@ -19026,12 +19041,14 @@ function ProjectTheme_send_email_on_priv_mess_received($sender_uid, $receiver_ui
 		$account_url 	= get_permalink(get_option('ProjectTheme_my_account_page_id'));
 
 		$sndr			= get_userdata($sender_uid);
+        
+        $sndr_link      = ProjectTheme_get_user_profile_link($sender_uid, true);
+//        $sndr_link      = sprintf('%s', ProjectTheme_get_user_profile_link($sender_uid));
 
 
+		$find 		= array('##sender_username##', '##sender_link##','##receiver_username##', '##site_login_url##', '##your_site_name##', '##your_site_url##' , '##my_account_url##');
 
-		$find 		= array('##sender_username##', '##receiver_username##', '##site_login_url##', '##your_site_name##', '##your_site_url##' , '##my_account_url##');
-
-   		$replace 	= array($sndr->user_login, $user->user_login, $site_login_url, $site_name, get_bloginfo('siteurl'), $account_url);
+   		$replace 	= array($sndr->user_login, $sndr_link, $user->user_login, $site_login_url, $site_name, get_bloginfo('siteurl'), $account_url);
 
 		
 
