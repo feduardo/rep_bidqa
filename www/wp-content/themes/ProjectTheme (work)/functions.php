@@ -16816,7 +16816,7 @@ function ProjectTheme_send_email($recipients, $subject = '', $message = '') {
 
 			 
 
-			$message = projectTheme_makeClickableLinks($message);			
+//			$message = projectTheme_makeClickableLinks($message);			
 
 			$mailtext = "<html><head><title>" . $subject . "</title></head><body>" . nl2br($message) . "</body></html>";
 
@@ -19038,7 +19038,7 @@ function ProjectTheme_send_email_on_priv_mess_received($sender_uid, $receiver_ui
 
 		$site_name 		= get_bloginfo('name');
 
-		$account_url 	= get_permalink(get_option('ProjectTheme_my_account_page_id'));
+		$account_url 	= projectTheme_makeClickableLinks(get_permalink(get_option('ProjectTheme_my_account_page_id')));
 
 		$sndr			= get_userdata($sender_uid);
         

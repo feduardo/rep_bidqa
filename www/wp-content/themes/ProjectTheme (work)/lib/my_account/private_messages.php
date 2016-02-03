@@ -765,8 +765,11 @@ function ProjectTheme_my_account_private_messages_area_function()
 					//sitemile_send_email($user->user_email, __('Private Message Received','ProjectTheme') , $message);
 					
 					
-					if($ProjectTheme_moderate_private_messages == false)
-						ProjectTheme_send_email_on_priv_mess_received($myuid, $uids);
+					if($ProjectTheme_moderate_private_messages == false) {
+                        
+                        ProjectTheme_send_email_on_priv_mess_received($myuid, $uids);
+                    
+                    }
 					else
 					{
 						//send message to admin to moderate		
