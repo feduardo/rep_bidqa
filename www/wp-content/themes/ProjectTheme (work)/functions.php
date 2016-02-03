@@ -353,6 +353,8 @@
 
  
 
+
+
  function Project_CLASS_THM_my_plugin_admin_init() {
 
        
@@ -371,7 +373,7 @@
 
 class Project_Walker_Nav_Menu extends Walker_Nav_Menu {
 
-  function start_lvl(&$output, $depth) {
+  function start_lvl( &$output, $depth = 0, $args = array() ) {
 
     $indent = str_repeat("\t", $depth);
 
@@ -10157,7 +10159,7 @@ function ProjectTheme_get_user_profile_link($uid, $named = false)
         $link = get_bloginfo('url'). '/?p_action=user_profile&post_author='. $uid;
         $name = get_user_by('id', $uid)->user_login;
         
-        $result = '<a href="' . $link . '" target="_blank">' . $name . '</a>';
+        $result = '<a href="' . $link . '" >' . $name . '</a>';
         
 //        var_dump($result);
         
@@ -16696,7 +16698,7 @@ function ProjectTheme_get_credits($uid)
 
 function projectTheme_makeClickableLinks($s) {
 
-  return preg_replace('@(https?://([-\w\.]+[-\w])+(:\d+)?(/([\w/_\.#-]*(\?\S+)?[^\.\s])?)?)@', '<a href="$1" target="_blank">$1</a>', $s);
+  return preg_replace('@(https?://([-\w\.]+[-\w])+(:\d+)?(/([\w/_\.#-]*(\?\S+)?[^\.\s])?)?)@', '<a href="$1">$1</a>', $s);
 
 }
 
@@ -21246,6 +21248,77 @@ function view_all_users_online(){
 
 		return $vstrsnln_number_bots + $vstrsnln_number_users + $vstrsnln_number_guests;
 
+}
+
+
+ /*************************************************
+ * 
+ * Change error massages on login page
+ * Override WP function
+ * 
+ ************************************************/
+
+remove_filter( 'authenticate', 'wp_authenticate_username_password' );
+add_filter( 'authenticate', 'ProjectTheme_authenticate_username_password', 20, 3 );
+
+/*
+ * default function is in wp-includes/user.php
+ */
+
+function ProjectTheme_authenticate_username_password($user, $username, $password) {
+	if ( $user instanceof WP_User ) {
+		return $user;
+	}
+
+	if ( empty($username) || empty($password) ) {
+		if ( is_wp_error( $user ) )
+			return $user;
+
+		$error = new WP_Error();
+
+		if ( empty($username) )
+			$error->add('empty_username', __('<strong>ERROR</strong>: The username field is empty.'));
+
+		if ( empty($password) )
+			$error->add('empty_password', __('<strong>ERROR</strong>: The password field is empty.'));
+
+		return $error;
+	}
+
+	$user = get_user_by('login', $username);
+
+	if ( !$user ) {
+		return new WP_Error( 'invalid_username',
+			__( '<strong>ERROR</strong>: Your password or username is incorrect.' ) .
+			' <a href="' . wp_lostpassword_url() . '">' .
+			__( 'Lost your password?' ) .
+			'</a>'
+		);
+	}
+
+	/**
+	 * Filter whether the given user can be authenticated with the provided $password.
+	 *
+	 * @since 2.5.0
+	 *
+	 * @param WP_User|WP_Error $user     WP_User or WP_Error object if a previous
+	 *                                   callback failed authentication.
+	 * @param string           $password Password to check against the user.
+	 */
+	$user = apply_filters( 'wp_authenticate_user', $user, $password );
+	if ( is_wp_error($user) )
+		return $user;
+
+	if ( ! wp_check_password( $password, $user->user_pass, $user->ID ) ) {
+		return new WP_Error( 'incorrect_password',
+			__( '<strong>ERROR</strong>: Your password or username is incorrect.' ) .
+			' <a href="' . wp_lostpassword_url() . '">' .
+			__( 'Lost your password?' ) .
+			'</a>'
+		);
+	}
+
+	return $user;
 }
 
 ?>
