@@ -227,7 +227,7 @@ function ProjectTheme_my_account_private_messages_area_function()
 					
 					$(document).ready(function() {
 						//set initial state.
-                                                                               alert('ss');
+
 					 $('#privatedel').click(function(){ 
               
               var ss=$(this).parent().text();
@@ -557,8 +557,10 @@ function ProjectTheme_my_account_private_messages_area_function()
 			
 			if($myuid == $row->initiator) $owner = true; else $owner = false;
 			
-			//if(!$owner)
-			$wpdb->query("update ".$wpdb->prefix."project_pm set rd='1' where id='{$row->id}'");
+            // mark messags is read if user = myuid
+			if($myuid == $row->user) {
+                $wpdb->query("update ".$wpdb->prefix."project_pm set rd='1' where id='{$row->id}'");
+            }
 			
 	
 		?>        
