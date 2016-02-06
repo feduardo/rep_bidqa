@@ -825,10 +825,28 @@ if($new_Project_step == "2")
 	 
       
       
-        <li>
-        <h2><?php _e("Feature project?",'ProjectTheme'); ?></h2>
-        <p><input type="checkbox" class="do_input_new" name="featured" value="1" 
-		<?php $feature = get_post_meta($pid, 'featured', true); echo ($feature == "1" ? "checked='checked'" : ""); ?> /> 
+        
+          <table class="form-table">
+              <thead>
+              <th style="width: 30%"></th>
+              <th style="width: 5%"></th>
+              <th style="margin-left: 10px"></th>
+              </thead>
+                  
+            <tbody>
+                
+            <tr>
+        
+            <th>
+                <label class="h4"><?php _e("Feature project?",'ProjectTheme'); ?></label>
+            </td>
+            <td>
+                <input type="checkbox" class="do_input_new" name="featured" value="1" 
+		<?php $feature = get_post_meta($pid, 'featured', true); echo ($feature == "1" ? "checked='checked'" : ""); ?> />
+            </td>    
+            
+            <td>
+            
         <?php 
 		
 				
@@ -837,8 +855,13 @@ if($new_Project_step == "2")
 		if(empty($projectTheme_featured_fee) or $projectTheme_featured_fee <= 0) $sl = '';
 		
 		
-		printf(__("By clicking this checkbox you mark your project as featured. %s", 'ProjectTheme'), $sl); ?></p>
-        </li>
+		printf(__("By clicking this checkbox you mark your project as featured. %s", 'ProjectTheme'), $sl); ?>
+            
+            </td>
+            
+        </tr>
+            
+        
         
         <?php endif; ?>
         
@@ -852,19 +875,30 @@ if($new_Project_step == "2")
 						   
 						   ?>
         
-        <li>
-        <h2><?php _e("Sealed Bidding?",'ProjectTheme'); ?></h2>
-        <p><input type="checkbox" class="do_input_new" name="private_bids" value="1"
-        <?php $private_bids = get_post_meta($pid, 'private_bids', true); echo ($private_bids == "1" ? "checked='checked'" : ""); ?> /> 
-        <?php 
+        <tr>
+            <td>
+                <label class="h4"><?php _e("Sealed Bidding?",'ProjectTheme'); ?></label>
+            </td>
+        
+        <td>
+            <input type="checkbox" class="do_input_new" name="private_bids" value="1"
+        <?php $private_bids = get_post_meta($pid, 'private_bids', true); echo ($private_bids == "1" ? "checked='checked'" : ""); ?> />
+            
+        </td> 
+        
+        <td>
+            <?php 
 		
 		$projectTheme_sealed_bidding_fee = get_option('projectTheme_sealed_bidding_fee');
 		$sl = __('Extra fee is applied','ProjectTheme');
 		if(empty($projectTheme_sealed_bidding_fee) or $projectTheme_sealed_bidding_fee <= 0) $sl = '';
 		
 		
-		printf(__("By clicking this checkbox you hide your project's bids. %s", 'ProjectTheme'), $sl); ?></p>
-        </li>
+		printf(__("By clicking this checkbox you hide your project's bids. %s", 'ProjectTheme'), $sl); ?>
+        </td>
+        
+        </tr>
+        
         <?php endif; ?>
         
         <?php do_action('ProjectTheme_step2_before_sealed_bidding'); ?>
@@ -876,18 +910,35 @@ if($new_Project_step == "2")
 						   
 						   ?>        
         
-        <li>
-        <h2><?php _e("Hide Project from<br> search engines",'ProjectTheme'); ?></h2>
-        <p><input type="checkbox" class="do_input_new" name="hide_project" value="1" 
+        <tr>
+            <td>
+                <label class="h4"><?php _e("Hide Project from search engines",'ProjectTheme'); ?></label>
+            </td>
+            
+            <td>
+                <input type="checkbox" class="do_input_new" name="hide_project" value="1" 
         <?php $hide_project = get_post_meta($pid, 'hide_project', true); echo ($hide_project == "1" ? "checked='checked'" : ""); ?>/> 
+                
+            </td>
+            
+            <td>
+                
         <?php 
 		
 		$projectTheme_hide_project_fee = get_option('projectTheme_hide_project_fee');
 		$sl = __('Extra fee is applied','ProjectTheme');
 		if(empty($projectTheme_hide_project_fee) or $projectTheme_hide_project_fee <= 0) $sl = '';
 		
-		echo sprintf(__("By clicking this checkbox you hide your project from search engines. %s", 'ProjectTheme'), $sl); ?></p>
-        </li>
+		echo sprintf(__("By clicking this checkbox you hide your project from search engines. %s", 'ProjectTheme'), $sl); ?>
+                
+            </td>
+        
+        
+        </tr>
+        
+        
+        </tbody>
+        </table>
         <?php endif; ?>
         
 		<?php do_action('ProjectTheme_step2_before_hide_project'); ?>
