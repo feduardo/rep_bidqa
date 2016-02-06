@@ -736,7 +736,7 @@ myDropzone.on("removedfile", function(file, response) {
         <li>
         <h2>&nbsp;</h2>
         <p> 
-        <input type="submit" name="project_submit1" value="<?php _e("Next Step", 'ProjectTheme'); ?> >>" class="submit_bottom"   /></p>
+        <input type="submit" name="project_submit1" value="<?php _e("Next Step", 'ProjectTheme'); ?> &rarr;" class="submit_bottom"   /></p>
         </li>
     	
         <?php do_action('ProjectTheme_step1_after_submit'); ?>
@@ -903,8 +903,8 @@ if($new_Project_step == "2")
 		$stp = apply_filters('ProjectTheme_filter_go_back_stp2', $stp);
 		
 		?>
-        <p><a href="<?php echo ProjectTheme_post_new_with_pid_stuff_thg($pid, $stp); ?>" class="go_back_btn" ><?php _e('<< Go Back','ProjectTheme'); ?></a> 
-        <input type="submit" name="project_submit2" value="<?php _e("Next Step", 'ProjectTheme'); ?> >>" class="submit_bottom" /></p>
+        <p><a href="<?php echo ProjectTheme_post_new_with_pid_stuff_thg($pid, $stp); ?>" class="go_back_btn" ><?php _e('&larr; Go Back','ProjectTheme'); ?></a> 
+        <input type="submit" name="project_submit2" value="<?php _e("Next Step", 'ProjectTheme'); ?> &rarr;" class="submit_bottom" /></p>
         </li>
     
     
@@ -932,8 +932,8 @@ if($new_Project_step == "3")
 
 <div class="padd10">
 
-<a href="<?php echo ProjectTheme_post_new_with_pid_stuff_thg($pid, 2); ?>" class="go_back_btn" ><?php _e('<< Go Back','ProjectTheme'); ?></a> 
-<a href="<?php echo ProjectTheme_post_new_with_pid_stuff_thg($pid, 4); ?>" class="go_back_btn" style="width:123px;" ><?php _e('Next Step >>','ProjectTheme'); ?></a> 
+<a href="<?php echo ProjectTheme_post_new_with_pid_stuff_thg($pid, 2); ?>" class="go_back_btn" ><?php _e('&larr; Go Back','ProjectTheme'); ?></a> 
+<a href="<?php echo ProjectTheme_post_new_with_pid_stuff_thg($pid, 4); ?>" class="go_back_btn" ><?php _e('Next Step &rarr;','ProjectTheme'); ?></a> 
 
 </div>
 <div class="clear10"></div>
@@ -2220,7 +2220,7 @@ if($new_Project_step == "4")
 	
 	echo '<div class="padd10">';
 	if($finalize == false)
-	echo ' <a href="'. ProjectTheme_post_new_with_pid_stuff_thg($pid, '3') .'" class="go_back_btn" >'.__('<< Go Back','ProjectTheme').'</a>';
+	echo ' <a href="'. ProjectTheme_post_new_with_pid_stuff_thg($pid, '3') .'" class="go_back_btn" >'.__('&larr; Go Back','ProjectTheme').'</a>';
 	
 	if($total == 0 && $finalize == false)
 	echo ' <a href="'. ProjectTheme_post_new_with_pid_stuff_thg($pid, '4', 'finalize').'" 

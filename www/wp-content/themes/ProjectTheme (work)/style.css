@@ -7190,7 +7190,7 @@ a.go_back_btn:link, a.go_back_btn:visited {
 
     border-radius: 5px;
 
-    width: 120px;
+    width: 130px;
 
 		font-size: 15px;
 
@@ -7201,6 +7201,8 @@ a.go_back_btn:link, a.go_back_btn:visited {
 		border-bottom: 3px solid #5AA01F;
 
 		text-transform: capitalize;
+                
+                text-align: center;
 
 		text-decoration: none;
 
