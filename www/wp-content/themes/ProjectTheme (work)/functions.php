@@ -10685,6 +10685,11 @@ function projectTheme_get_post_main_function ( $arr = '')
             
 
             <div class="excerpt-thing">
+                
+                <div class="project-description">
+                    
+                    <label><?php _e('Description', 'ProjectTheme') ?></label>
+                    <p>
 
             	<?php 
 
@@ -10707,7 +10712,19 @@ function projectTheme_get_post_main_function ( $arr = '')
 					echo substr($tg, 0, 250);
 
 				}
+                
+                ?>
+                    </p>
+                    </div>
+                    <?php
+                    
+                
+                    
+                if ($closed == 0) {
+                          
+                        ProjectTheme_get_buttons_my_deliv_2();
 
+                }
 				
 
 				?>
@@ -13180,7 +13197,111 @@ function projectTheme_get_post_acc()
 
 }}
 
+function ProjectTheme_get_buttons_my_deliv_2 (){
+    ?>
+    <div class="my-deliv_2">
 
+					 	<?php if($pay_this_me == 1): ?>
+
+                        <a href="<?php echo ProjectTheme_get_pay4project_page_url(get_the_ID()); ?>" 
+
+                        class="post_bid_btn"><?php echo __("Pay This", "ProjectTheme");?></a>
+
+                        <?php endif; ?>
+
+                        
+
+                   <?php if(1 ) { ?>  
+
+                 
+
+                  <?php if( $pay_this_me != 1): ?>
+
+                  <a href="<?php the_permalink(); ?>" class="green_btn3"><?php echo __("Read More", "ProjectTheme");?></a>
+
+                  <?php endif; ?>
+
+                  
+
+                  <?php if( $unpaid == 1): 
+
+				  
+
+				  	$finalised_posted = get_post_meta(get_the_ID(),'finalised_posted',true);
+
+					if($finalised_posted == "1") $finalised_posted = 3; else $finalised_posted = "1";
+
+				  	
+
+					$finalised_posted = apply_filters('ProjectTheme_publish_prj_posted', $finalised_posted);
+
+					
+
+				  ?>
+
+                  <a href="<?php echo ProjectTheme_post_new_with_pid_stuff_thg(get_the_ID(), $finalised_posted); ?>" class="green_btn3"><?php echo __("Publish", "ProjectTheme");?></a>
+
+                  <?php endif; ?>
+
+                  
+
+                  
+
+                
+
+                  
+
+				  <?php if($post->post_author == $uid) { ?>
+
+                  <a href="<?php bloginfo('siteurl') ?>/?p_action=edit_project&pid=<?php the_ID(); ?>" class="green_btn3"><?php echo __("Edit Project", "ProjectTheme");?></a>
+
+                  <?php }   ?>
+
+                  
+
+                  <?php if($post->post_author == $uid) //$closed == 1) 
+
+				  { ?> 
+
+                  
+
+                   <?php if($closed == "1") //$closed == 1) 
+
+				  { ?>
+
+                  <a href="<?php bloginfo('siteurl') ?>/?p_action=repost_project&pid=<?php the_ID(); ?>" class="green_btn3"><?php echo __("Repost Project", "ProjectTheme");?></a>
+
+                  
+
+                  <?php } /*} else { */  ?>
+
+                	<?php
+
+					
+
+					$winner = get_post_meta(get_the_ID(),'winner', true);
+
+					
+
+					if(empty($winner)):
+
+					?>
+
+                   <a href="<?php bloginfo('siteurl') ?>/?p_action=delete_project&pid=<?php the_ID(); ?>" class="green_btn3"><?php echo __("Delete", "ProjectTheme");?></a>
+
+                  <?php endif; ?>
+
+                  
+
+                  <?php } ?>
+
+                  
+
+                  <?php } ?>
+
+                </div>
+    <?php
+}
 
 
 
