@@ -688,130 +688,46 @@ function ProjectTheme_my_account_private_messages_area_function()
 					endif;
 				endif;
 				
-				
-				
-				if(!empty($_POST['to_as']))
-				{
-					global $current_user;
-					get_currentuserinfo();
-                    
-                    $to_as = get_user_by('email', $_POST['to_as']);
-				
-					$uids = projectTheme_get_userid_from_username($to_as->user_login);	
-					 
-					
-					//if($uids == $current_user->ID) { $uids = false; $error_mm = 1; $cant_send = 1; }
-				}
-				
 				if(empty($uids))
 				{
 					$uids = $_GET['uid'];
 					 
 				}
 				
-			 
-				
-				if($uids != false and $error_mm != "1"):
-				
-				global $current_user;
-				get_currentuserinfo();
-				$myuid = $current_user->ID;
-				
-				//echo $message;
-				//*********************************************
-				
-				$ProjectTheme_moderate_private_messages = get_option('ProjectTheme_moderate_private_messages');
-				if($ProjectTheme_moderate_private_messages == "yes") $ProjectTheme_moderate_private_messages = true;
-				else $ProjectTheme_moderate_private_messages = false;
-				
-				//--------------------------
-				
-				if($ProjectTheme_moderate_private_messages == true)
+				if(!empty($_POST['to_as']))
 				{
-					$approved = '0';	
-					$show_to_destination = '0';
-				}
-				else
-				{
-					$approved = '1';
-					$show_to_destination = '1';	
-				}
-				
-				//*********************************************
-				
-				
-				global $wpdb; $wpdb->show_errors = true; $tm = $_POST['tm']; //current_time('timestamp',0);		
-				
-				
-				$sr = "select * from ".$wpdb->prefix."project_pm where initiator='$myuid' and user='$uids' and datemade='$tm'";
-				$rr = $wpdb->get_results($sr);
-				
-				if(count($rr) == 0)
-				{
-				
-					if(empty($pid)) $pid = 0;
-					
-					$s = "insert into ".$wpdb->prefix."project_pm 
-					(approved, subject, content, datemade, pid, initiator, user, file_attached, show_to_destination) 
-					values('$approved','$subject','$message','$tm','$pid','$myuid','$uids', '$attach_id', '$show_to_destination')";	
-						
-					$wpdb->query($s); //echo $s;
-					//echo $wpdb->last_error;
-					
-				//-----------------------
-					
-					$user = get_userdata($uid);
-					$message = sprintf(__("You have just received a private message regarding your project: <a href='%s'>%s</a><br/>
-					<a href='%s'>Click here to read the message</a>.", "ProjectTheme"),get_permalink($pid),
-					$post->post_title,get_bloginfo('siteurl')."/my-account/private-messages");
-					//sitemile_send_email($user->user_email, __('Private Message Received','ProjectTheme') , $message);
-					
-					
-					if($ProjectTheme_moderate_private_messages == false) {
-                        
-                        ProjectTheme_send_email_on_priv_mess_received($myuid, $uids);
                     
+					global $current_user;
+					get_currentuserinfo();
+                    
+                    if(is_array($_POST['to_as'])){
+                        
+                        foreach ($_POST['to_as'] as $value) {
+                            $to_as = get_user_by('email', $value);
+
+                            $uids = projectTheme_get_userid_from_username($to_as->user_login);	
+
+                            ProjectTheme_send_priv_mess_to_person($uids, $uid,$error_mm, $subject,$message,$pid, $attach_id, $user, $post,$cant_send );
+                        }
+                        
+                    }else{
+                    
+                        $to_as = get_user_by('email', $_POST['to_as']);
+
+                        $uids = projectTheme_get_userid_from_username($to_as->user_login);	
+
+                        ProjectTheme_send_priv_mess_to_person($uids, $uid, $error_mm, $subject,$message,$pid, $attach_id, $user, $post,$cant_send );
+                        //if($uids == $current_user->ID) { $uids = false; $error_mm = 1; $cant_send = 1; }
                     }
-					else
-					{
-						//send message to admin to moderate		
-							
-					}
-					
-				
 				}
 				
-			//-----------------------		
-				?>
+				
                 
-                <div class="my_box3">
-            	<div class="padd10">
-                 <?php 
-				 
-				 if($ProjectTheme_moderate_private_messages == false)				 
-				 	_e('Your message has been sent.','ProjectTheme');
-				 else
-				  	_e('Your message has been sent but the receiver will receive it only after moderation.','ProjectTheme')
-				 
-				  ?>
-                </div>
-                </div>
                 
-                <?php
+                
 				
-				else:
-				
-					if($error_mm == "1") { 
-					
-						if($cant_send == 1) echo __('You cannot send a message to yourself.','ProjectTheme');
-					 	else echo sprintf(__('Wrong File format: %s','ProjectTheme'), $uploaded_file_type);
-						
-					}
-					else _e('ERROR! wrong username provided.','ProjectTheme');
-				
-				endif;
-				
-					
+        
+            
 			}
 			else
 			{
@@ -883,9 +799,10 @@ function ProjectTheme_my_account_private_messages_area_function()
 				$rtt = ProjectTheme_get_my_awarded_projects2($current_user->ID);
 				
 				?>
-                <tr>
+                <tr class="send-to-raw">
                 <td width="140" class="no_wrap"><?php _e("Send To (e-mail)", "ProjectTheme"); ?><font style="color:red;">*</font>&nbsp;:</td>
-                <td><input size="20" name="to_as" id="to_as" type="text" value="" /> <?php if($rtt): _e('or','ProjectTheme'); echo " ".$rtt; endif; ?></td>
+                <td width="200"><input size="20" name="to_as[]" class="to_as" type="text" value="" /> <?php if($rtt): _e('or','ProjectTheme'); echo " ".$rtt; endif; ?></td>
+                <td><input type="button" class="add_email" value="+" onclick="add_raw()"/></td>
                 </tr>
                 <?php endif; ?>
                 
@@ -895,6 +812,18 @@ function ProjectTheme_my_account_private_messages_area_function()
                 </tr>
                 
                  <script>
+                     
+                     function add_raw(){
+                         var html = jQuery('.send-to-raw:first').html();
+                         var btn_remove = '<td><input type="button" class="remove_email" value="X" onclick="remove_raw(this)"/></td>'
+                         html = '<tr class="send-to-raw">' + html +btn_remove  +'</tr>';
+                         jQuery('.send-to-raw:last').after(html);
+                     }
+                     
+                     function remove_raw(el){
+                         jQuery(el).parent('td').parent('tr').remove();
+                     }
+                     
 			
 			jQuery(document).ready(function(){
 			tinyMCE.init({
@@ -983,5 +912,117 @@ directionality, fullscreen, noneditable, visualchars, nonbreaking, xhtmlxtras, t
 <?php	
 } 
 
+
+function ProjectTheme_send_priv_mess_to_person($uids, $uid, $error_mm, $subject,$message,$pid, $attach_id, $user, $post,$cant_send ) {
+
+
+				
+				if($uids != false and $error_mm != "1"):
+				
+				global $current_user;
+				get_currentuserinfo();
+				$myuid = $current_user->ID;
+				
+				//echo $message;
+				//*********************************************
+				
+				$ProjectTheme_moderate_private_messages = get_option('ProjectTheme_moderate_private_messages');
+				if($ProjectTheme_moderate_private_messages == "yes") $ProjectTheme_moderate_private_messages = true;
+				else $ProjectTheme_moderate_private_messages = false;
+				
+				//--------------------------
+				
+				if($ProjectTheme_moderate_private_messages == true)
+				{
+					$approved = '0';	
+					$show_to_destination = '0';
+				}
+				else
+				{
+					$approved = '1';
+					$show_to_destination = '1';	
+				}
+				
+				//*********************************************
+				
+				
+				global $wpdb; $wpdb->show_errors = true; $tm = $_POST['tm']; //current_time('timestamp',0);		
+				
+				
+				$sr = "select * from ".$wpdb->prefix."project_pm where initiator='$myuid' and user='$uids' and datemade='$tm'";
+				$rr = $wpdb->get_results($sr);
+				
+				if(count($rr) == 0)
+				{
+				
+					if(empty($pid)) $pid = 0;
+					
+					$s = "insert into ".$wpdb->prefix."project_pm 
+					(approved, subject, content, datemade, pid, initiator, user, file_attached, show_to_destination) 
+					values('$approved','$subject','$message','$tm','$pid','$myuid','$uids', '$attach_id', '$show_to_destination')";	
+						
+					$wpdb->query($s); //echo $s;
+					//echo $wpdb->last_error;
+					
+				//-----------------------
+					
+					$user = get_userdata($uid);
+					$message = sprintf(__("You have just received a private message regarding your project: <a href='%s'>%s</a><br/>
+					<a href='%s'>Click here to read the message</a>.", "ProjectTheme"),get_permalink($pid),
+					$post->post_title,get_bloginfo('siteurl')."/my-account/private-messages");
+					//sitemile_send_email($user->user_email, __('Private Message Received','ProjectTheme') , $message);
+					
+					
+					if($ProjectTheme_moderate_private_messages == false) {
+                        
+                        ProjectTheme_send_email_on_priv_mess_received($myuid, $uids);
+                    
+                    }
+					else
+					{
+						//send message to admin to moderate		
+							
+					}
+					
+				
+				}
+				
+			//-----------------------		
+				?>
+                
+                <div class="my_box3">
+            	<div class="padd10">
+                 <?php 
+                 
+                 $user = get_userdata($uids);
+				 
+				 if($ProjectTheme_moderate_private_messages == false)				 
+				 	echo sprintf (__('Your message to user <b>%s</b> has been sent.','ProjectTheme'), $user->user_login);
+				 else
+				  	_e('Your message has been sent but the receiver will receive it only after moderation.','ProjectTheme')
+				 
+				  ?>
+                </div>
+                </div>
+                
+                <?php
+				
+				else:
+				
+					if($error_mm == "1") { 
+					
+						if($cant_send == 1) echo __('You cannot send a message to yourself.','ProjectTheme');
+					 	else echo sprintf(__('Wrong File format: %s','ProjectTheme'), $uploaded_file_type);
+						
+					}
+					else _e('ERROR! wrong username provided.','ProjectTheme');
+				
+				endif;
+				
+            }
+					
+            /*
+             * end function
+             */
 
 ?>

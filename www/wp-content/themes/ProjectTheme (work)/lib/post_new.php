@@ -2236,7 +2236,22 @@ if($new_Project_step == "4")
 		
 						$ProjectTheme_enable_credits_wallet = get_option('ProjectTheme_enable_credits_wallet');
 						if($ProjectTheme_enable_credits_wallet != 'no'):
-							echo '<a href="'.get_bloginfo('siteurl').'/?p_action=credits_listing&pid='.$pid.'" class="edit_project_pay_cls">'.__('Pay by Credits','ProjectTheme').'</a>';
+							?>
+                            <!--payment condition-->
+                            <div style="margin-top: 0; margin-bottom: 25px;">
+                                <input type="checkbox" id="cb-payment" name="payment-condition" />
+                                <span><?php 
+                                                                
+                                echo __('I have read and accept ', 'ProjectTheme'); 
+                                echo '<a href="" target="_blank">'. __('payment terms', 'ProjectTheme') .'</a>';
+                                ?></span>
+                            </div>
+                            
+                            
+                            
+                            <?php
+                            
+                            echo '<a href="'.get_bloginfo('siteurl').'/?p_action=credits_listing&pid='.$pid.'" id="123" class="edit_project_pay_cls">'.__('Pay by Credits','ProjectTheme').'</a>';
 						endif;
 						
 						global $project_ID;
@@ -2259,7 +2274,32 @@ if($new_Project_step == "4")
 							echo '<a href="'.get_bloginfo('siteurl').'/?p_action=payza_listing&pid='.$pid.'" class="edit_project_pay_cls">'.__('Pay by Payza','ProjectTheme').'</a>';
 						
 						do_action('ProjectTheme_add_payment_options_to_post_new_project', $pid);
-						
+                        
+                        ?>
+                        <script>
+                                jQuery('.edit_project_pay_cls').click(
+                                                                    function(){
+                                                                        alert('<?php _e('Please, accept payment terms', 'ThemeProject'); ?>');
+                                                                        return false;
+                                                                    });
+                                                                    
+                                                
+                                                    
+                                                        jQuery('#cb-payment').click(function() {
+                                                          if(!jQuery('#cb-payment').is(':checked')){
+                                                            jQuery('.edit_project_pay_cls').click(
+                                                                    function(){
+                                                                        alert('<?php _e('Please, accept payment terms', 'ThemeProject'); ?>');
+                                                                        return false;
+                                                                    });
+                                                                    
+                                                          }else{
+                                                            jQuery('.edit_project_pay_cls').unbind('click');
+                                                          }
+                                                        });
+                                
+                            </script>
+						<?php
 	
 	
 	} else  { echo '</table>'; }
