@@ -6781,13 +6781,20 @@ function projectTheme_username_is_valid($u)
 
 **************************************************************/
 
-function ProjectTheme_get_my_awarded_projects2($uid)
+function ProjectTheme_get_my_awarded_projects2($uid, $do_array = false)
 
-{
+{   
+    if ($do_array) {
 
-	$c = "<select name='projectss'><option value=''>".__('Select','ProjectTheme')."</option>";
+        $c = "<select name='projectss[]'><option value=''>".__('Select', 'ProjectTheme')."</option>";
 
-	global $wpdb;
+    } else {
+
+        $c = "<select name='projectss'><option value=''>".__('Select', 'ProjectTheme')."</option>";
+
+    }
+    
+    global $wpdb;
 
 
 

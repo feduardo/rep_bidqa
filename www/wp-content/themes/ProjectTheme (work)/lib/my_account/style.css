@@ -375,7 +375,7 @@ li.browse-by-category-thumbs
     padding: 7px;
 	
     /* Styles */
-    background: #5AA01F;
+    background: #3CAADD;
     border-radius: 7px 0 0 7px;
     border: 1px solid rgba(0,0,0,0.15);
     box-shadow: 0 1px 1px rgba(50,50,50,0.1);
@@ -1125,7 +1125,7 @@ margin-right: 20px;
 	font-size: 17px;
 	color: #fff;
  
-	background: #5AA01F;
+	background: #3CAADD;
  
 	text-transform: capitalize;
 	text-decoration: none; font-weight:700;
@@ -1265,7 +1265,7 @@ margin-right: 20px;
 .top-links ul li a:hover 
 {
  
-	color: #5AA01F
+	color: #3CAADD
 }
 
 #header
@@ -1330,7 +1330,7 @@ background-position:center
 {
 	margin:auto;
 	text-align:center;
-	background: #5AA01F;  
+	background: #3CAADD;  
  
 }
 
@@ -1583,7 +1583,7 @@ a.bighi:hover
 	width:100%;
 	height:60px;
 	margin:auto;
-	border-top:5px solid #5AA01F;
+	border-top:5px solid #3CAADD;
 }
 
 #steps ul
@@ -1613,7 +1613,7 @@ a.bighi:hover
 #steps ul li.active_step
 {
 
-	background:#5AA01F;
+	background:#3CAADD;
 	color:white;
 }
 
@@ -1974,8 +1974,8 @@ a.nice_link:link, a.nice_link:visited
 		padding: 3px 3px;
 		font-size: 11px;
 		color: #fff;
-		background: rgba(77, 140, 25, 1);
-		border-bottom: 2px solid #5AA01F;
+		background: #0D8ECA;
+		border-bottom: 2px solid #3CAADD;
 		text-transform: capitalize;
 		text-decoration: none;
 		font-weight: 400;
@@ -1987,7 +1987,7 @@ a.nice_link:link, a.nice_link:visited
 
 a.nice_link:hover
 {
-	background:#5AA01F
+	background:#3CAADD
 }
 
 
@@ -2516,8 +2516,8 @@ margin-right:4px;
 	font-size: 13px;
 	color: #fff;
 	 
-	background:rgba(77, 140, 25, 1);
-	border-bottom: 2px solid #5AA01F;
+	background:#0D8ECA;
+	border-bottom: 2px solid #3CAADD;
 	text-transform:capitalize;
 	text-decoration: none;
 	font-weight:600;
@@ -2528,7 +2528,7 @@ margin-right:4px;
 
 #logins li a:hover
 {
-	background:#5AA01F;
+	background:#3CAADD;
 	color:#fff;
 	text-decoration:none
 	
@@ -2840,7 +2840,7 @@ a.post_bid_btn_new:link, a.post_bid_btn_new:visited {
 font-size: 15px;
 color: #fff;
  
-background: #5AA01F;
+background: #3CAADD;
 border-bottom: 4px solid #7A9029;
 text-transform: uppercase;
 text-decoration: none;
@@ -2935,7 +2935,7 @@ a.post_bid_btn_new:hover
 #slider-controls
 {
 	width:100%;
-	border-top:1px solid #5AA01F;
+	border-top:1px solid #3CAADD;
 	overflow:hidden
 }
 
@@ -3231,7 +3231,7 @@ padding: 12px 15px;
 font-size: 15px;
 color: #fff;
  
-background: #5AA01F;
+background: #3CAADD;
 border-bottom: 4px solid #7A9029;
 text-transform: uppercase;
 text-decoration: none;
@@ -3330,8 +3330,8 @@ a.green_btn:link, a.green_btn:visited {
 	font-size: 13px;
 	color: #fff;
 	 border-radius:5px;
-	background:rgba(77, 140, 25, 1);
-	border-bottom: 2px solid #5AA01F;
+	background:#0D8ECA;
+	border-bottom: 2px solid #3CAADD;
 	text-transform:capitalize;
 	text-decoration: none;
 	font-weight:500;
@@ -3348,7 +3348,7 @@ a.green_btn:link, a.green_btn:visited {
 a.green_btn:hover
 {
 		
-		background:#5AA01F;
+		background:#3CAADD;
 		text-shadow: none ;
 		color:#fff;
 		text-decoration:none;
@@ -3595,8 +3595,8 @@ a.go_back_btn:link, a.go_back_btn:visited {
     width: 128px;
 		font-size: 15px;
 		color: #fff;
-		background: rgba(77, 140, 25, 1);
-		border-bottom: 3px solid #5AA01F;
+		background: #0D8ECA;
+		border-bottom: 3px solid #3CAADD;
 		text-transform: capitalize;
 		text-decoration: none;
 		font-weight: 500;
@@ -3613,8 +3613,8 @@ a.go_back_btn11:link, a.go_back_btn11:visited {
     width: 200px;
 		font-size: 15px;
 		color: #fff;
-		background: rgba(77, 140, 25, 1);
-		border-bottom: 3px solid #5AA01F;
+		background: #0D8ECA;
+		border-bottom: 3px solid #3CAADD;
 		text-transform: capitalize;
 		text-decoration: none;
 		font-weight: 500;
@@ -3632,8 +3632,8 @@ a.go_back_btn12:link, a.go_back_btn12:visited {
     width: 160px;
 		font-size: 15px;
 		color: #fff;
-		background: rgba(77, 140, 25, 1);
-		border-bottom: 3px solid #5AA01F;
+		background: #0D8ECA;
+		border-bottom: 3px solid #3CAADD;
 		text-transform: capitalize;
 		text-decoration: none;
 		font-weight: 500;
@@ -3881,8 +3881,8 @@ font-size: 18px;
 	padding: 12px 15px;
 	font-size: 15px;
 	color: #fff;	 
-	background:rgba(77, 140, 25, 1);
-	border-bottom: 3px solid #5AA01F;
+	background:#0D8ECA;
+	border-bottom: 3px solid #3CAADD;
 	text-transform:capitalize;
 	text-decoration: none;
 	border-radius:5px;
@@ -3900,8 +3900,8 @@ font-size: 18px;
 	font-size: 13px;
 	color: #fff;
 	 
-	background:rgba(77, 140, 25, 1);
-	border-bottom: 2px solid #5AA01F;
+	background:#0D8ECA;
+	border-bottom: 2px solid #3CAADD;
 	text-transform:capitalize;
 	text-decoration: none;
 	font-weight:500;
@@ -4128,7 +4128,7 @@ input[name="term"]{
  
 }
 #cssmenu > ul > li:hover > a {
-  color: #5AA01F;
+  color: #3CAADD;
 }
 #cssmenu > ul > li.has-sub > a {
   padding-right: 30px;
@@ -4291,7 +4291,7 @@ input[name="term"]{
   }
   #cssmenu ul ul li:hover > a,
   #cssmenu ul ul li.active > a {
-  	color: #5AA01F;
+  	color: #3CAADD;
     /*color: #ffffff;*/
   }
   #cssmenu ul ul,
@@ -4476,7 +4476,7 @@ input[name="term"]{
 }
 #cssmenu2 > ul > li:hover > a {
   color: #ffffff;
-  background:rgba(77, 140, 25, 1)
+  background:#0D8ECA
 }
 #cssmenu2 > ul > li.has-sub > a {
   padding-right: 30px;
@@ -4551,7 +4551,7 @@ input[name="term"]{
   text-decoration: none;
   color: #dddddd;
   font-weight: 400;
-  background: rgba(77, 140, 25, 1);
+  background: #0D8ECA;
 }
 #cssmenu2 ul ul li:last-child > a,
 #cssmenu2 ul ul li.last-item > a {

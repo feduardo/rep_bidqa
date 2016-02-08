@@ -680,44 +680,65 @@ function ProjectTheme_my_account_private_messages_area_function()
 				$message = $_POST['message_a'];
 				$uids = $_POST['to_as'];
 				
-				
-				
-				if(isset($_POST['projectss'])):
-					if(!empty($_POST['projectss'])):
-						$uids = $_POST['projectss'];
-					endif;
-				endif;
-				
 				if(empty($uids))
 				{
 					$uids = $_GET['uid'];
 					 
 				}
 				
-				if(!empty($_POST['to_as']))
+//				elseif(isset($_POST['projectss'])){
+//					if(!empty($_POST['projectss'])){
+//						$uids = $_POST['projectss'];
+//                    }
+//                }
+				
+				
+				
+				if(!empty($_POST['to_as']) || !empty($_POST['projectss']))
 				{
                     
 					global $current_user;
 					get_currentuserinfo();
                     
-                    if(is_array($_POST['to_as'])){
+                    if(is_array($_POST['to_as']) || is_array($_POST['projectss'])){
                         
-                        foreach ($_POST['to_as'] as $value) {
-                            $to_as = get_user_by('email', $value);
+                        for ($index = 0; $index < count($_POST['projectss']); $index++) {
+                            
+                            if ($_POST['projectss'][$index] !== "") {
+                                
+                                $to_as = get_user_by('id', $_POST['projectss'][$index]);
+                                
+                            }else{
+                                
+                                $to_as = get_user_by('email', $_POST['to_as'][$index]);
 
+                            }
+                            
                             $uids = projectTheme_get_userid_from_username($to_as->user_login);	
 
                             ProjectTheme_send_priv_mess_to_person($uids, $uid,$error_mm, $subject,$message,$pid, $attach_id, $user, $post,$cant_send );
                         }
                         
-                    }else{
+                                                
+                    }else{ // it isn't array
+                        
+                        if ($_POST['projectss'] !== '') {
+                            
+                            $to_as = get_user_by('id', $_POST['projectss']);
+                            
+                            
+                        } else{
                     
-                        $to_as = get_user_by('email', $_POST['to_as']);
+                            $to_as = get_user_by('email', $_POST['to_as']);
 
+                        }
+                        
                         $uids = projectTheme_get_userid_from_username($to_as->user_login);	
 
                         ProjectTheme_send_priv_mess_to_person($uids, $uid, $error_mm, $subject,$message,$pid, $attach_id, $user, $post,$cant_send );
                         //if($uids == $current_user->ID) { $uids = false; $error_mm = 1; $cant_send = 1; }
+                        
+                        
                     }
 				}
 				
@@ -796,7 +817,7 @@ function ProjectTheme_my_account_private_messages_area_function()
                 <table>
                 <?php if(empty($uid)): 
 				
-				$rtt = ProjectTheme_get_my_awarded_projects2($current_user->ID);
+				$rtt = ProjectTheme_get_my_awarded_projects2($current_user->ID, true);
 				
 				?>
                 <tr class="send-to-raw">
@@ -1008,14 +1029,22 @@ function ProjectTheme_send_priv_mess_to_person($uids, $uid, $error_mm, $subject,
                 <?php
 				
 				else:
-				
-					if($error_mm == "1") { 
+				?>
+					<div class="my_box3">
+                    <div class="padd10">
+                <?php  
+                    if($error_mm == "1") { 
 					
 						if($cant_send == 1) echo __('You cannot send a message to yourself.','ProjectTheme');
 					 	else echo sprintf(__('Wrong File format: %s','ProjectTheme'), $uploaded_file_type);
 						
 					}
 					else _e('ERROR! wrong username provided.','ProjectTheme');
+                    
+                    ?>
+                    </div>    
+                    </div>    
+                    <?php
 				
 				endif;
 				

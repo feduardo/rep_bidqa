@@ -557,7 +557,8 @@
 	font-family: 'Open Sans', sans-serif;
 	font-size: 13px;
 	color: #fff;
-	background: #5AA01F;
+	/*background: #5AA01F;*/ 
+	background: #3CAADD;
 	text-decoration: none;
 	display: inline-block;
 }

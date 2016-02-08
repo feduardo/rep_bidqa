@@ -4,7 +4,7 @@ Theme Name: ProjectTheme (work)
 
 Theme URI: http://sitemile.com/products/wordpress-project-freelancer-theme/
 
-Description: The only wordpress theme that allows you to build a project bidding, freelancer, or chores website from your wordpress blog. A turn-key solution for your business. Create a full featured outsourcing website in minutes. Last fixed bids: BID-465, BID-370, BID-365, BID-287, BID-125, BID-356, BID-430, BID-421, BID-396, BID-389
+Description: The only wordpress theme that allows you to build a project bidding, freelancer, or chores website from your wordpress blog. A turn-key solution for your business. Create a full featured outsourcing website in minutes. Last fixed bids: BID-465, BID-370, BID-365, BID-287, BID-125, BID-356, BID-430, BID-421, BID-396, BID-389, BID-478
 
 Author: SiteMile
 
@@ -24,7 +24,7 @@ Tags: project, black, bid, budget, rating, feedback
 
     border: 0px;
 
-    background-color: #70A347;
+    background-color: #0D8ECA;
 
     margin-top: 3px;
 
@@ -744,7 +744,7 @@ li.browse-by-category-thumbs
 
     /* Styles */
 
-    background: #5AA01F;
+    background: #3CAADD;
 
     border-radius: 7px 0 0 7px;
 
@@ -2244,7 +2244,7 @@ margin-right: 20px;
 
  
 
-	background: #5AA01F;
+	background: #3CAADD;
 
  
 
@@ -2266,13 +2266,22 @@ margin-right: 20px;
 
 {
 
-	background:#7A9029;
+	background:#FFF;
 
-	color:#fff;
+	/*color:#fff;*/
+	color: #3CAADD;
 
-	text-decoration:none	;
+	text-decoration: none	;
 
 	text-shadow: none;
+        
+        border: #3CAADD ;
+        
+        border-color: #3CAADD;
+        
+        border-style: solid;
+        
+        border-width: 1px;
 
 }
 
@@ -2524,7 +2533,7 @@ margin-right: 20px;
 
  
 
-	color: #5AA01F
+	color: #3CAADD
 
 }
 
@@ -2654,7 +2663,7 @@ background-position:center
 
 	text-align:center;
 
-	background: #5AA01F;  
+	background: #3CAADD;  
 
  
 
@@ -3176,7 +3185,7 @@ a.bighi:hover
 
 	margin:auto;
 
-	border-top:5px solid #5AA01F;
+	border-top:5px solid #3CAADD;
 
 }
 
@@ -3236,7 +3245,7 @@ a.bighi:hover
 
 
 
-	background:#5AA01F;
+	background:#3CAADD;
 
 	color:white;
 
@@ -3952,9 +3961,9 @@ a.nice_link:link, a.nice_link:visited
 
 		color: #fff;
 
-		background: rgba(77, 140, 25, 1);
+		background: #0D8ECA;
 
-		border-bottom: 2px solid #5AA01F;
+		border-bottom: 2px solid #3CAADD;
 
 		text-transform: capitalize;
 
@@ -3978,7 +3987,7 @@ a.nice_link:hover
 
 {
 
-	background:#5AA01F
+	background:#3CAADD
 
 }
 
@@ -5038,9 +5047,9 @@ margin-right:4px;
 
 	 
 
-	background:rgba(77, 140, 25, 1);
+	background:#0D8ECA;
 
-	border-bottom: 2px solid #5AA01F;
+	border-bottom: 2px solid #3CAADD;
 
 	text-transform:capitalize;
 
@@ -5062,7 +5071,7 @@ margin-right:4px;
 
 {
 
-	background:#5AA01F;
+	background:#3CAADD;
 
 	color:#fff;
 
@@ -5682,13 +5691,14 @@ a.post_bid_btn_new:link, a.post_bid_btn_new:visited {
 
 font-size: 15px;
 
-color: #fff;
+/*color: #fff;*/
+color: #3CAADD;
 
  
 
-background: #5AA01F;
+background: #3CAADD;
 
-border-bottom: 4px solid #7A9029;
+border-bottom: 4px solid #CCD1D3;
 
 text-transform: uppercase;
 
@@ -5714,9 +5724,10 @@ a.post_bid_btn_new:hover
 
 		
 
-		background:#7A9029;
+		background:#CCD1D3;
 
-		color:#FFF;
+		/*color:#FFF;*/
+		color:#3CAADD;
 
 		text-decoration:none;
 
@@ -5876,7 +5887,7 @@ a.post_bid_btn_new:hover
 
 	width:100%;
 
-	border-top:1px solid #5AA01F;
+	border-top:1px solid #3CAADD;
 
 	overflow:hidden
 
@@ -6464,13 +6475,14 @@ padding: 12px 15px;
 
 font-size: 15px;
 
-color: #fff;
+/*color: #fff;*/
+color: #3CAADD;
 
  
 
-background: #5AA01F;
+background: #3CAADD;
 
-border-bottom: 4px solid #7A9029;
+border-bottom: 4px solid #CCD1D3;
 
 text-transform: uppercase;
 
@@ -6666,9 +6678,9 @@ a.green_btn:link, a.green_btn:visited {
 
 	 border-radius:5px;
 
-	background:rgba(77, 140, 25, 1);
+	background:#0D8ECA;
 
-	border-bottom: 2px solid #5AA01F;
+	border-bottom: 2px solid #3CAADD;
 
 	text-transform:capitalize;
 
@@ -6702,7 +6714,7 @@ a.green_btn:hover
 
 		
 
-		background:#5AA01F;
+		background:#3CAADD;
 
 		text-shadow: none ;
 
@@ -7196,9 +7208,9 @@ a.go_back_btn:link, a.go_back_btn:visited {
 
 		color: #fff;
 
-		background: rgba(77, 140, 25, 1);
+		background: #0D8ECA;
 
-		border-bottom: 3px solid #5AA01F;
+		border-bottom: 3px solid #3CAADD;
 
 		text-transform: capitalize;
                 
@@ -7234,9 +7246,9 @@ a.go_back_btn11:link, a.go_back_btn11:visited {
 
 		color: #fff;
 
-		background: rgba(77, 140, 25, 1);
+		background: #0D8ECA;
 
-		border-bottom: 3px solid #5AA01F;
+		border-bottom: 3px solid #3CAADD;
 
 		text-transform: capitalize;
 
@@ -7272,9 +7284,9 @@ a.go_back_btn12:link, a.go_back_btn12:visited {
 
 		color: #fff;
 
-		background: rgba(77, 140, 25, 1);
+		background: #0D8ECA;
 
-		border-bottom: 3px solid #5AA01F;
+		border-bottom: 3px solid #3CAADD;
 
 		text-transform: capitalize;
 
@@ -7770,9 +7782,9 @@ font-size: 18px;
 
 	color: #fff;	 
 
-	background:rgba(77, 140, 25, 1);
+	background:#0D8ECA;
 
-	border-bottom: 3px solid #5AA01F;
+	border-bottom: 3px solid #3CAADD;
 
 	text-transform:capitalize;
 
@@ -7808,9 +7820,9 @@ font-size: 18px;
 
 	 
 
-	background:rgba(77, 140, 25, 1);
+	background:#0D8ECA;
 
-	border-bottom: 2px solid #5AA01F;
+	border-bottom: 2px solid #3CAADD;
 
 	text-transform:capitalize;
 
@@ -8262,7 +8274,7 @@ input[name="term"]{
 
 #cssmenu > ul > li:hover > a {
 
-  color: #5AA01F;
+  color: #3CAADD;
 
 }
 
@@ -8588,7 +8600,7 @@ input[name="term"]{
 
   #cssmenu ul ul li.active > a {
 
-  	color: #5AA01F;
+  	color: #3CAADD;
 
     /*color: #ffffff;*/
 
@@ -8958,7 +8970,7 @@ input[name="term"]{
 
   color: #ffffff;
 
-  background:rgba(77, 140, 25, 1)
+  background:#0D8ECA
 
 }
 
@@ -9108,7 +9120,7 @@ input[name="term"]{
 
   font-weight: 400;
 
-  background: rgba(77, 140, 25, 1);
+  background: #0D8ECA;
 
 }
 
@@ -11438,7 +11450,7 @@ input[name="term"]{
 
         padding: 16px;
 
-        border: 16px solid #5AA01F;
+        border: 16px solid #3CAADD;
 
         background-color: white;
 
