@@ -22,7 +22,7 @@ define('DB_NAME', 'ugotrumo_bidqadb');
 define('DB_USER', 'ugotrumo_bidqadb');
 
 /** MySQL database password */
-define('DB_PASSWORD', 'gV1ac0m99!');
+define('DB_PASSWORD', 'V1ac0m99!');
 
 /** MySQL hostname */
 define('DB_HOST', 'localhost');
