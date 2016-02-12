@@ -21,11 +21,10 @@
 *
 
 ***************************************************************************/
-    
-    // load options for local
 
-//    update_option('siteurl', 'http://bidqa.loc');
-//    update_option('home', 'http://bidqa.loc');
+    // load options for local
+   // update_option('siteurl', 'http://bidqa.loc');
+   // update_option('home', 'http://bidqa.loc');
 //    update_option('siteurl', 'https://bidqa.com');
 //    update_option('home', 'https://bidqa.com');
 
@@ -35,9 +34,8 @@
 
 	// load the theme template for translation
 
-	
-
-	DEFINE("PROJECTTHEME_VERSION", "2.0.9.1");
+    
+    DEFINE("PROJECTTHEME_VERSION", "2.0.9.1");
 
 	DEFINE("PROJECTTHEME_RELEASE", "13 July 2015");
 
@@ -6786,11 +6784,11 @@ function ProjectTheme_get_my_awarded_projects2($uid, $do_array = false)
 {   
     if ($do_array) {
 
-        $c = "<select name='projectss[]'><option value=''>".__('Select', 'ProjectTheme')."</option>";
+        $c = "<select class='projectss' name='projectss[]'><option value=''>".__('Select', 'ProjectTheme')."</option>";
 
     } else {
 
-        $c = "<select name='projectss'><option value=''>".__('Select', 'ProjectTheme')."</option>";
+        $c = "<select class='projectss' name='projectss'><option value=''>".__('Select', 'ProjectTheme')."</option>";
 
     }
     
@@ -21232,7 +21230,7 @@ function redirect_to_ssl()	 {
 
 }
 
-add_action('template_redirect', 'redirect_to_ssl',100);
+//add_action('template_redirect', 'redirect_to_ssl',100);
 
 
 
@@ -21386,8 +21384,14 @@ function view_all_users_online(){
  * 
  ************************************************/
 
-remove_filter( 'authenticate', 'wp_authenticate_username_password' );
-add_filter( 'authenticate', 'ProjectTheme_authenticate_username_password', 20, 3 );
+global $pagenow;
+
+if ($pagenow == 'wp-login.php') {
+    
+    remove_filter( 'authenticate', 'wp_authenticate_username_password' );
+    add_filter( 'authenticate', 'ProjectTheme_authenticate_username_password', 20, 3 );
+
+}
 
 /*
  * default function is in wp-includes/user.php
