@@ -75,12 +75,29 @@ if(!is_user_logged_in()) { wp_redirect(get_bloginfo('siteurl')."/wp-login.php");
 		
 		update_post_meta($pid, 'outstanding',	"1");
 		update_post_meta($pid, 'delivered',		"0");
+        
+        Bid::update_meta_by_id($bid->id, 'outstanding',	"1");
+        Bid::update_meta_by_id($bid->id, 'delivered',	"0");
+        Bid::update_meta_by_id($bid->id, 'mark_coder_delivered',	"0");
+        Bid::update_meta_by_id($bid->id, 'mark_coder_delivered_date',	"0");
+        Bid::update_meta_by_id($bid->id, 'mark_seller_accepted',	"0");
+        Bid::update_meta_by_id($bid->id, 'mark_seller_accepted_date',	"0");
+        
 		
 		update_post_meta($pid, 'mark_coder_delivered',		"0");
 		update_post_meta($pid, 'mark_seller_accepted',		"0");
+		update_post_meta($pid, 'mark_coder_delivered_date',		"0");
+		update_post_meta($pid, 'mark_seller_accepted_date',		"0");
+		update_post_meta($pid, 'paid_user',		"0");
+		update_post_meta($pid, 'paid_user_date',		"0");
 		
 		$expected_delivery = ($bid->days_done * 3600 * 24) + current_time('timestamp',0);
-		update_post_meta($pid, 'expected_delivery',		$expected_delivery);
+
+        
+        Bid::update_meta_by_id($bid->id, 'expected_delivery', $expected_delivery);
+        
+        $all_expected_delivery = Bid::get_field_by_pid($pid, 'expected_delivery');
+        update_post_meta($pid, 'expected_delivery', max($all_expected_delivery));
 		
 		//------------------------------------------------------------------------------
 		if($bids){
@@ -118,6 +135,7 @@ if(!is_user_logged_in()) { wp_redirect(get_bloginfo('siteurl')."/wp-login.php");
 		//update_post_meta($pid, 'winner', $uid);
 		$query = "insert into wp_postmeta (post_id, meta_key, meta_value) values ($pid, 'winner', $uid);";
 		$wpdb->query($query);
+        Bid::update_meta_by_id($bid->id, 'paid',	"0");
 		update_post_meta($pid, 'paid_user',"0");
 	//}
 
@@ -179,6 +197,7 @@ get_header();
                 <div class="clear10"></div>
                
                <form method="post" enctype="application/x-www-form-urlencoded"> 
+                   <input type="hidden" name="bid" value="<?php echo $_GET['bid']; ?>">    
                 
                <input type="submit" name="yes" value="<?php _e("choose a winner",'ProjectTheme'); ?>" />
                <input type="submit" name="no"  value="<?php _e("No",'ProjectTheme'); ?>" />

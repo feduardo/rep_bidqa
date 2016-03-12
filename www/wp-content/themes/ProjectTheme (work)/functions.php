@@ -23,8 +23,8 @@
 ***************************************************************************/
 
     // load options for local
-   // update_option('siteurl', 'http://bidqa.loc');
-   // update_option('home', 'http://bidqa.loc');
+//    update_option('siteurl', 'http://bidqa.loc');
+//    update_option('home', 'http://bidqa.loc');
 //    update_option('siteurl', 'https://bidqa.com');
 //    update_option('home', 'https://bidqa.com');
 
@@ -52,6 +52,10 @@
 	
 
 	//----------------------------------------------------------
+    
+    include 'classes/bid.class';
+    include 'classes/project.class';
+    include 'classes/escrow.class';
 
 	
 
@@ -2889,7 +2893,7 @@ function ProjectTheme_replace_stuff_for_me($find, $replace, $subject)
 
 
 
-function projectTheme_get_winner_bid($pid,$array=0)
+function projectTheme_get_winner_bid($pid, $single = false)
 
 {
 
@@ -2899,7 +2903,7 @@ function projectTheme_get_winner_bid($pid,$array=0)
 
 	$r = $wpdb->get_results($s);
 
-	if(!$array){
+	if($single){
 
 		return $r[0];	
 
@@ -6201,33 +6205,40 @@ function ProjectTheme_get_users_links()
 
 
 
+//				 $querystr = "
+//
+//					SELECT distinct wposts.ID 
+//
+//					FROM $wpdb->posts wposts, $wpdb->postmeta wpostmeta2, $wpdb->postmeta wpostmeta3
+//
+//					WHERE wposts.post_author='$uid' AND wposts.ID = wpostmeta2.post_id 
+//
+//					AND wpostmeta2.meta_key='paid_user' AND wpostmeta2.meta_value='0'
+//
+//					
+//
+//					AND wposts.ID = wpostmeta3.post_id AND
+//
+//					wpostmeta3.meta_key='delivered' AND wpostmeta3.meta_value='1'
+//
+//					
+//
+//					 AND wposts.post_type = 'project' ";
 				 $querystr = "
 
-					SELECT distinct wposts.ID 
-
-					FROM $wpdb->posts wposts, $wpdb->postmeta wpostmeta2, $wpdb->postmeta wpostmeta3
-
-					WHERE wposts.post_author='$uid' AND wposts.ID = wpostmeta2.post_id AND
-
-					wpostmeta2.meta_key='paid_user' AND wpostmeta2.meta_value='0'
-
-					
-
-					AND wposts.ID = wpostmeta3.post_id AND
-
-					wpostmeta3.meta_key='delivered' AND wpostmeta3.meta_value='1'
-
-					
-
-					 AND wposts.post_type = 'project' ";
-
-				
-
+					SELECT distinct p.ID 
+                    
+                    FROM $wpdb->posts AS p
+                        
+                    LEFT JOIN " . $wpdb->prefix . "project_bids AS pb ON p.ID = pb.pid
+                        
+                    WHERE   p.post_author = '$uid'
+                        AND pb.winner = '1'
+                        AND pb.paid = '0'
+                        AND pb.delivered = '1'
+                        AND p.post_type = 'project' ";
+										 
 				 $pageposts = $wpdb->get_results($querystr, OBJECT);
-
-			
-
-			
 
 					$ttl_prj = count($pageposts);
 
@@ -6291,11 +6302,12 @@ function ProjectTheme_get_users_links()
 
 					SELECT distinct wposts.ID 
 
-					FROM $wpdb->posts wposts, $wpdb->postmeta wpostmeta2
+					FROM $wpdb->posts wposts, $wpdb->postmeta wpostmeta2, $wpdb->postmeta wpostmeta3
 
-					WHERE wposts.post_author='$uid' AND wposts.ID = wpostmeta2.post_id AND
+					WHERE wposts.post_author='$uid' AND wposts.ID = wpostmeta2.post_id AND wposts.ID = wpostmeta3.post_id AND
 
-					wpostmeta2.meta_key='outstanding' AND wpostmeta2.meta_value='1' AND wposts.post_type = 'project' AND wposts.post_status= 'publish'";
+					wpostmeta2.meta_key='outstanding' AND wpostmeta2.meta_value='1' AND wposts.post_type = 'project' AND wposts.post_status= 'publish' "
+                        . " AND wpostmeta3.meta_key='mark_coder_delivered' AND wpostmeta3.meta_value = '1'";
 
 				
 
@@ -7159,7 +7171,7 @@ function ProjectTheme_get_my_awarded_projects($uid)
 
 					SELECT distinct wposts.* 
 
-					FROM $wpdb->posts wposts, $wpdb->postmeta wpostmeta 
+					FROM $wpdb->posts wposts, $wpdb->postmeta wpostmeta, $wpdb->postmeta wp2
 
 					WHERE wposts.post_author='$uid' 
 
@@ -7172,6 +7184,10 @@ function ProjectTheme_get_my_awarded_projects($uid)
 					AND wpostmeta.meta_key = 'paid_user' 
 
 					AND wpostmeta.meta_value = '0'
+
+					AND wp2.meta_key = 'delivered' 
+
+					AND wp2.meta_value = '1'
 
 					ORDER BY wposts.post_date DESC";
 
@@ -10152,7 +10168,7 @@ function ProjectTheme_get_user_feedback_link($uid)
 
 
 
-function ProjectTheme_get_user_profile_link($uid, $named = false)
+function ProjectTheme_get_user_profile_link($uid, $named = false, $bold = false)
 
 {
     if (!$named) {
@@ -10161,17 +10177,41 @@ function ProjectTheme_get_user_profile_link($uid, $named = false)
 
     }else{
         
+        $b = ($bold)? '<b>' : '';
+        $b_end = ($bold)? '</b>' : '';
+        
         $link = get_bloginfo('url'). '/?p_action=user_profile&post_author='. $uid;
         $name = get_user_by('id', $uid)->user_login;
         
-        $result = '<a href="' . $link . '" >' . $name . '</a>';
-        
-//        var_dump($result);
+        $result = "<a href='$link'>$b$name$b_end</a>";
         
         return $result;
-        
     }
-	
+
+}
+
+function ProjectTheme_get_project_link($pid, $named = false, $bold = false)
+
+{
+    $post = get_post($pid);
+    
+    if (!$named) {
+
+        return get_post_permalink($post->ID);	
+
+    }else{
+        
+        
+        $b = ($bold)? '<b>' : '';
+        $b_end = ($bold)? '</b>' : '';
+        
+        $link = get_post_permalink($post->ID);
+        $name = $post->post_title;
+        
+        $result = "<a href='$link'>$b$name$b_end</a>";
+        
+        return $result;
+    }
 
 }
 
@@ -10553,9 +10593,9 @@ function projectTheme_get_post_main_function ( $arr = '')
 
 	$pid = get_the_ID();
 
-	global $post;
+	global $post, $current_user;
 
-	
+	get_current_user();
 
 	$ending 			= get_post_meta(get_the_ID(), 'ending', true);
 
@@ -10739,24 +10779,57 @@ function projectTheme_get_post_main_function ( $arr = '')
             <?php 
 
             global $wpdb;
+            
+            
 
             $providersResult = $wpdb->get_results('select * FROM wp_users inner JOIN wp_postmeta on wp_users.ID = wp_postmeta.meta_value where wp_postmeta.meta_key="winner" and wp_postmeta.post_id='.$pid);
 
-            		
+            if ($post->post_author != $current_user->ID) {
+                            
+                foreach ($providersResult as $key => $value) {
+                    if ($value->ID != $current_user->ID) {
+                        unset($providersResult[$key]);
+                    }
+                }
+
+            }		
 
             		if($providersResult){            			
 
             			echo '<div class="excerpt-thing">';	
 
-            			echo "<strong>Current QA Engineers</strong>";
+//            			echo "<strong>Current QA Engineers</strong>";
 
             			$time_spent = get_post_meta($pid, 'time_spent', true);
 
             			$time_spent = unserialize($time_spent);
+                        
+                        
+                        /*
+                         * users table
+                         */
+                        
+                        ?>
+                            <table class="table-condensed table-hover">
+                            <tr>
+                                <th class="bold_stuff"><?php _e('Current QA Engineer','ThemeProject'); ?></th>
+                                <th class="bold_stuff center"><?php _e('Time work','ThemeProject'); ?></th>
+                                <th class="bold_stuff center"><?php _e('Bid status','ThemeProject'); ?></th>
+                                <th ></th>
+                            </tr>
+
+                        <?php
+                        
+                        
+                        
 
             			foreach($providersResult as $user_info ){
 
             				//$user_info = get_userdata($id);
+                            
+                            $bid = Bid::get_by_pid_uid($pid, $user_info->ID);
+                            
+                            $status = Bid::get_status($bid);
 
             				if($time_spent[$user_info->ID]['count_time']){
 
@@ -10782,11 +10855,28 @@ function projectTheme_get_post_main_function ( $arr = '')
 
             				
 
-            				echo '<p><a href="'.ProjectTheme_get_user_profile_link($user_info->ID).'">' . $user_info->user_login .'</a><span> ('.$str_time.')</span></p>';
+//            				echo '<p><a href="'.ProjectTheme_get_user_profile_link($user_info->ID).'">' . $user_info->user_login .'</a><span> ('.$str_time.')</span></p>';
+                            
+                            ?>
+            
+            
+                            <tr>
+                                <td><?php echo '<a href="'.ProjectTheme_get_user_profile_link($user_info->ID).'">' . $user_info->user_login .'</a>'; ?></td>
+                                <td class="center"><span>(<?php echo $str_time;?>)</span></td>
+                                <td class="center"><?php echo $status['name']; ?></td>
+                                <td></td>
+                            </tr>
+                            
+
+                        
+            
+                        <?php
 
             				
 
             			}
+                        
+                        ?> </table> <?php
 
             			echo "</div>";
 
@@ -11069,428 +11159,6 @@ function projectTheme_get_post_my_proposal ( $arr = '')
 
 
 
-
-function projectTheme_get_post_main_function2( $arr = '')
-
-{
-
-
-
-			if($arr[0] == "winner") 	$pay_this_me = 1;
-
-			if($arr[0] == "winner_not") $pay_this_me2 = 1;
-
-			if($arr[0] == "unpaid") 	$unpaid = 1;
-
-
-
-			$ending 			= get_post_meta(get_the_ID(), 'ending', true);
-
-			$sec 				= $ending - current_time('timestamp',0);
-
-			$location 			= get_post_meta(get_the_ID(), 'Location', true);		
-
-			$closed 			= get_post_meta(get_the_ID(), 'closed', true);
-
-			$featured 			= get_post_meta(get_the_ID(), 'featured', true);
-
-			$private_bids 		= get_post_meta(get_the_ID(), 'private_bids', true);
-
-			$paid		 		= get_post_meta(get_the_ID(), 'paid', true);
-
-			$post				= get_post(get_the_ID());
-
-
-
-			//echo $paid;
-
-			
-
-			global $current_user;
-
-			get_currentuserinfo();
-
-			$uid = $current_user->ID;
-
-			
-
-			
-
-			do_action('ProjectTheme_regular_proj_post_before');
-
-			
-
-?>
-
-				<div class="post" id="post-<?php the_ID(); ?>"><div class="padd10">
-
-                
-
-                <?php if($featured == "1"): ?>
-
-                <div class="featured-one"></div>
-
-                <?php endif; ?>
-
-                
-
-                
-
-                <?php if($private_bids == "yes" or $private_bids == "1"): ?>
-
-                <div class="sealed-one"></div>
-
-                <?php endif; ?>
-
-                
-
-                
-
-                <div class="padd10_only_top">
-
-                
-
-               
-
-                
-
-                <div class="image_holder">
-
-                
-
-                 <?php
-
-				
-
-				$ProjectTheme_enable_images_in_projects = get_option('ProjectTheme_enable_images_in_projects');
-
-				if($ProjectTheme_enable_images_in_projects == "yes"):
-
-					
-
-					$width 	= 40;
-
-					$height = 32;
-
-					$image_class = "image_class";
-
-					
-
-					
-
-					$width 			= apply_filters("ProjectTheme_regular_proj_img_width", 	$width);
-
-					$height 		= apply_filters("ProjectTheme_regular_proj_img_height", $height);
-
-					$image_class 	= apply_filters("ProjectTheme_regular_proj_img_class", 	$image_class);
-
-					
-
-					
-
-				?>
-
-                
-
-                <a href="<?php the_permalink(); ?>" title="<?php the_title(); ?>"><img alt="<?php the_title(); ?>" width="<?php echo $width; ?>" height="<?php echo $height; ?>" class="<?php echo $image_class; ?>" 
-
-                src="<?php echo ProjectTheme_get_first_post_image(get_the_ID(),$width,$height); ?>" /></a>
-
-               
-
-               <?php endif; ?>
-
-               
-
-                </div>
-
-  
-
-                
-
-                <div class="title_holder" > 
-
-                     <h2><a class="post-title-class" href="<?php the_permalink() ?>" rel="bookmark" title="<?php the_title(); ?>">
-
-                        <?php 
-
-						
-
-						do_action('ProjectTheme_regular_proj_title_before');
-
-                        the_title(); 
-
-						do_action('ProjectTheme_regular_proj_title_after');
-
-                        
-
-                        ?></a></h2>
-
-                        
-
-                        
-
-                  <?php if(1) { ?>     
-
-                        
-
-                      
-
-                        
-
-                  <p class="mypostedon">
-
-                        <?php _e("Posted in",'ProjectTheme');?>: <?php echo get_the_term_list( get_the_ID(), 'project_cat', '', ', ', '' ); ?> 
-
-                        <?php _e("by",'ProjectTheme');?>: <a href="<?php bloginfo('siteurl'); ?>?p_action=user_profile&post_author=<?php echo $post->post_author; ?>"><?php the_author() ?></a> 
-
-                        
-
-                        <?php
-
-							
-
-							$projectTheme_admin_approves_each_project = get_option('projectTheme_admin_approves_each_project');
-
-							
-
-							if($post->post_status == "draft" && $closed == "0" && $paid == "1" && $projectTheme_admin_approves_each_project == "yes")
-
-							{
-
-								echo '<br/><em>' . __('Your project is awaiting moderation.','ProjectTheme') . "</em>";	
-
-								
-
-							}
-
-						
-
-						?>
-
-                        
-
-                        
-
-                        </p>
-
-                       
-
-                        
-
-                        
-
-                        
-
-                                <p class="task_buttons">   
-
-                        <?php if($pay_this_me == 1): ?>
-
-                        <a href="<?php echo ProjectTheme_get_pay4project_page_url(get_the_ID()); ?>" 
-
-                        class="post_bid_btn"><?php echo __("Pay This", "ProjectTheme");?></a>
-
-                        <?php endif; ?>
-
-                        
-
-                   <?php if(1 ) { ?>  
-
-                 
-
-                  <?php if( $pay_this_me != 1): ?>
-
-                  <a href="<?php the_permalink(); ?>" class="post_bid_btn"><?php echo __("Read More", "ProjectTheme");?></a>
-
-                  <?php endif; ?>
-
-                  
-
-                  <?php if( $unpaid == 1): 
-
-				  
-
-				  	$finalised_posted = get_post_meta(get_the_ID(),'finalised_posted',true);
-
-					if($finalised_posted == "1") $finalised_posted = 3; else $finalised_posted = "1";
-
-				  	
-
-					$finalised_posted = apply_filters('ProjectTheme_publish_prj_posted', $finalised_posted);
-
-					
-
-				  ?>
-
-                  <a href="<?php echo ProjectTheme_post_new_with_pid_stuff_thg(get_the_ID(), $finalised_posted); ?>" class="post_bid_btn"><?php echo __("Publish", "ProjectTheme");?></a>
-
-                  <?php endif; ?>
-
-                  
-
-                  
-
-                
-
-                  
-
-				  <?php if($post->post_author == $uid) { ?>
-
-                  <a href="<?php bloginfo('siteurl') ?>/?p_action=edit_project&pid=<?php the_ID(); ?>" class="post_bid_btn"><?php echo __("Edit Project", "ProjectTheme");?></a>
-
-                  <?php }   ?>
-
-                  
-
-                  <?php if($post->post_author == $uid) //$closed == 1) 
-
-				  { ?> 
-
-                  
-
-                   <?php if($closed == "1") //$closed == 1) 
-
-				  { ?>
-
-                  <a href="<?php bloginfo('siteurl') ?>/?p_action=repost_project&pid=<?php the_ID(); ?>" class="post_bid_btn"><?php echo __("Repost Project", "ProjectTheme");?></a>
-
-                  
-
-                  <?php } /*} else { */  ?>
-
-                	<?php
-
-					
-
-					$winner = get_post_meta(get_the_ID(),'winner', true);
-
-					
-
-					if(empty($winner)):
-
-					?>
-
-                   <a href="<?php bloginfo('siteurl') ?>/?p_action=delete_project&pid=<?php the_ID(); ?>" class="post_bid_btn"><?php echo __("Delete", "ProjectTheme");?></a>
-
-                  <?php endif; ?>
-
-                  
-
-                  <?php } ?>
-
-                  
-
-                  <?php } ?>
-
-                  </p>
-
-                        
-
-                        
-
-                     </div> 
-
-                     
-
-                  <div class="details_holder"> <?php } ?>
-
-                  
-
-                  
-
-                  
-
-                  <ul class="project-details1">
-
-							<li>
-
-								<img src="<?php echo get_bloginfo('template_url'); ?>/images/price.png" width="15" height="15" /> 
-
-								<h3><?php echo __("Budget:",'ProjectTheme'); ?></h3>
-
-								<p><?php 
-
-								
-
-								  $sel = get_post_meta(get_the_ID(), 'budgets', true);
-
-		  						echo ProjectTheme_get_budget_name_string_fromID($sel);
-
-								
-
-								 ?>
-
-                                
-
-                                </p>
-
-							</li>
-
-					
-
-             			<?php
-
-		
-
-			$ProjectTheme_enable_project_location = get_option('ProjectTheme_enable_project_location');
-
-			if($ProjectTheme_enable_project_location == "yes"):
-
-		
-
-		?>
-
-                        
-
-							<li>
-
-								<img src="<?php echo get_bloginfo('template_url'); ?>/images/location.png" width="15" height="15" /> 
-
-								<h3><?php echo __("Location:",'ProjectTheme'); ?></h3>
-
-								<p><?php echo get_the_term_list( get_the_ID(), 'project_location', '', ', ', '' ); ?></p>
-
-							</li>
-
-                            
-
-			<?php endif; ?>				
-
-					
-
-							<li>
-
-								<img src="<?php echo get_bloginfo('template_url'); ?>/images/clock.png" width="15" height="15" /> 
-
-								<h3><?php echo __("Expires in:",'ProjectTheme'); ?></h3>
-
-								<p><?php echo ($closed=="1" ? __('Closed', 'ProjectTheme') : ProjectTheme_prepare_seconds_to_words($ending - current_time('timestamp',0))); ?></p>
-
-							</li>
-
-							
-
-						</ul>
-
-                      
-
-               
-
-                  </div>   
-
-                     
-
-                     </div></div></div>
-
-<?php
-
-	
-
-	do_action('ProjectTheme_regular_proj_post_after');
-
-
-
-}
 
 /*************************************************************
 
@@ -12196,13 +11864,18 @@ function projectTheme_get_post_awaiting_compl_function()
 
 			
 
-			$mark_coder_delivered 			= get_post_meta(get_the_ID(), 'mark_coder_delivered', true);
+//			$mark_coder_delivered 			= get_post_meta(get_the_ID(), 'mark_coder_delivered', true);
+			
 
 			$posted 						= get_the_time("jS M Y");
 
 			$post							= get_post(get_the_ID());
+            
+            $pid = get_the_ID();
 
-
+            $mark_coder_delivered_array 	= Bid::get_field_by_pid($pid, 'mark_coder_delivered');
+            
+            $project_bids                   = Bid::get_by_pid_uid($pid);
 
 			
 
@@ -12212,7 +11885,8 @@ function projectTheme_get_post_awaiting_compl_function()
 
 			$uid 		 = $current_user->ID;			
 
-			$bid 		 = projectTheme_get_winner_bid(get_the_ID());
+//			$bid 		 = projectTheme_get_winner_bid(get_the_ID());
+			$bid 		 = Bid::get_by_pid_uid($pid, $uid);
 
 			$bid_wn 	 = ProjectTheme_get_show_price($bid->bid);
 
@@ -12326,13 +12000,13 @@ function projectTheme_get_post_awaiting_compl_function()
 
             	
 
-                
+                    <!--Nobode mark as delivered-->
 
-                	<?php if($mark_coder_delivered != "1"): ?>
+                	<?php if(!in_array("1", $mark_coder_delivered_array)): ?>
 
        
 
-                        <?php _e('All winners must mark this as delivered to complete.','ProjectTheme'); ?>
+                        <?php _e('Nobody mark this project as delivered to complete.','ProjectTheme'); ?>
 
                         <?php
 
@@ -12412,34 +12086,58 @@ function projectTheme_get_post_awaiting_compl_function()
 
 				     else: 
 
-				   
+                        $dv_bids = Bid::get_by_pid_uid($pid, $uid = '', $single = false, array("mark_coder_delivered='1'", "mark_seller_accepted='0'"));
+                     
+                     
+                     ?>
+                        
+                    <div>
+                            
+                        
+                        <?php
+                     
+                        foreach ($dv_bids as $one_bid) {
+                            
+                            $user = get_user_by('id', $one_bid->uid);
+                            
+                            $dv = $one_bid->mark_coder_delivered_date;
+                            
+                            $dv = date_i18n('d-M-Y H:i:s',$dv);
+                            
+                            $user_link = "<a href='".ProjectTheme_get_user_profile_link($user->ID)."'>$user->user_login</a>"
 
-				   		$dv = get_post_meta(get_the_ID(), 'mark_coder_delivered_date', true);
+                            ?>
+                            <div>
+                                <div>
 
-				   		$dv = date_i18n('d-M-Y H:i:s',$dv);
+                                    <span class="zbk_zbk">
 
-				   
+                                        <?php printf(__("Marked as delivered on: <b>%s</b> by %s", "ProjectTheme"), $dv, $user_link); ?>
+                                </div>
+                                <div>
 
-				   ?>
+                                    <span style="white-space: nowrap;">
 
-                   
+                                        <?php _e('Accept this project and: ', 'ProjectTheme'); ?>
 
-                   <span class="zbk_zbk">
+                                        <a href="<?php echo get_bloginfo('siteurl'); ?>/?p_action=mark_completed&bid=<?= $one_bid->id ?>&pid=<?= $pid; ?>" 
 
-                   <?php printf(__("Marked as delivered on: %s","ProjectTheme"), $dv); ?><br/><br/>
+                                           class="green_btn inline-block"><?php echo __("Mark Completed", "ProjectTheme"); ?></a>
 
-                   <?php _e('Accept this project and: ','ProjectTheme'); ?>
+                                    </span>
 
-                     <a href="<?php echo get_bloginfo('siteurl'); ?>/?p_action=mark_completed&pid=<?php the_ID(); ?>" 
+                                    <span style="white-space: nowrap;">
+                                        <?php _e('Or: ', 'ProjectTheme'); ?><a href="<?php echo get_bloginfo('siteurl'); ?>/?p_action=mark_in_progress&bid=<?= $one_bid->id ?>&pid=<?= $pid; ?>" 
 
-                        class="green_btn"><?php echo __("Mark Completed", "ProjectTheme");?></a>
+                                           class="grey_btn inline-block"><?php echo __("Mark in progress again", "ProjectTheme"); ?></a>
+                                    </span>
 
-                   
+                                </div>
 
-                   </span>
+                        </div>
 
-                   
-
+                   <?php } ?>
+                    </div>
                    <?php endif; ?>
 
                    
@@ -12504,357 +12202,6 @@ function projectTheme_get_post_awaiting_compl_function()
 
 
 
-function projectTheme_get_post_awaiting_compl_function_old()
-
-{
-
-		$ending 			= get_post_meta(get_the_ID(), 'ending', true);
-
-			$sec 				= $ending - current_time('timestamp',0);
-
-			$location 			= get_post_meta(get_the_ID(), 'Location', true);		
-
-			$closed 			= get_post_meta(get_the_ID(), 'closed', true);
-
-			$featured 			= get_post_meta(get_the_ID(), 'featured', true);
-
-			
-
-			$mark_coder_delivered 			= get_post_meta(get_the_ID(), 'mark_coder_delivered', true);
-
-			
-
-			$post				= get_post(get_the_ID());
-
-
-
-			
-
-			global $current_user;
-
-			get_currentuserinfo();
-
-			$uid = $current_user->ID;
-
-			
-
-?>
-
-				<div class="post" id="post-<?php the_ID(); ?>"><div class="padd10">
-
-                
-
-                <?php if($featured == "1"): ?>
-
-                <div class="featured-one"></div>
-
-                <?php endif; ?>
-
-                
-
-                
-
-                <?php if($private_bids == "yes" or $private_bids == "1"): ?>
-
-                <div class="sealed-one"></div>
-
-                <?php endif; ?>
-
-                
-
-                
-
-                <div class="padd10_only_top">
-
-                <div class="image_holder">
-
-                 <?php
-
-				
-
-				$ProjectTheme_enable_images_in_projects = get_option('ProjectTheme_enable_images_in_projects');
-
-				if($ProjectTheme_enable_images_in_projects == "yes"):
-
-					
-
-					$width 	= 40;
-
-					$height = 32;
-
-					$image_class = "image_class";
-
-					
-
-					
-
-					$width 			= apply_filters("ProjectTheme_awaiting_completion_proj_img_width", 	$width);
-
-					$height 		= apply_filters("ProjectTheme_awaiting_completion_proj_img_height", 	$height);
-
-					$image_class 	= apply_filters("ProjectTheme_awaiting_completion_proj_img_class", 	$image_class);
-
-					
-
-					
-
-				?>
-
-                
-
-                <a href="<?php the_permalink(); ?>" title="<?php the_title(); ?>"><img alt="<?php the_title(); ?>" width="<?php echo $width; ?>" height="<?php echo $height; ?>" class="<?php echo $image_class; ?>" 
-
-                src="<?php echo ProjectTheme_get_first_post_image(get_the_ID(),$width,$height); ?>" /></a>
-
-               
-
-               <?php endif; ?>
-
-               
-
-                </div>
-
-                <div class="title_holder" > 
-
-                     <h2><a class="post-title-class" href="<?php the_permalink() ?>" rel="bookmark" title="<?php the_title(); ?>"><?php the_title(); ?></a></h2>
-
-                        
-
-    
-
-                        
-
-                  <p class="mypostedon">
-
-                        <?php _e("Posted in",'ProjectTheme');?>: <?php echo get_the_term_list( get_the_ID(), 'project_cat', '', ', ', '' ); ?> 
-
-                        <?php _e("by",'ProjectTheme');?>: <a href="<?php bloginfo('siteurl'); ?>?p_action=user_profile&post_author=<?php echo $post->post_author; ?>"><?php the_author() ?></a> 
-
-                  </p>
-
-                       
-
-                        
-
-              <p class="task_buttons">   
-
-                        
-
-		
-
-       				<?php if($mark_coder_delivered != "1"): ?>
-
-       
-
-                        <?php _e('The winner must mark this as delivered.','ProjectTheme'); ?>
-
-                        <?php
-
-						
-
-							if(!projecttheme_escrow_was_made_for_project_done(get_the_ID())):
-
-							
-
-							$ProjectTheme_enable_credits_wallet = get_option('ProjectTheme_enable_credits_wallet');
-
-							if($ProjectTheme_enable_credits_wallet != 'no'):
-
-													
-
-						?> 
-
-                        <br/>
-
-                        <a href="<?php echo ProjectTheme_get_payments_page_url_redir('escrow') ?>" class="post_bid_btn"><?php _e('Make Escrow','ProjectTheme') ?></a>
-
-                        
-
-                        <?php endif; else: echo '<br/>'; _e('Escrow was made for this project.','ProjectTheme'); endif;
-
-                   
-
-				     else: 
-
-				   
-
-				   		$dv = get_post_meta(get_the_ID(), 'mark_coder_delivered_date', true);
-
-				   		$dv = date_i18n('d-M-Y H:i:s',$dv);
-
-				   
-
-				   ?>
-
-                   
-
-                   <span class="zbk_zbk">
-
-                   <?php printf(__("Marked as delivered on: %s","ProjectTheme"), $dv); ?><br/><br/>
-
-                   <?php _e('Accept this project and: ','ProjectTheme'); ?>
-
-                     <a href="<?php echo get_bloginfo('siteurl'); ?>/?p_action=mark_completed&pid=<?php the_ID(); ?>" 
-
-                        class="green_btn"><?php echo __("Mark Completed", "ProjectTheme");?></a>
-
-                   
-
-                   </span>
-
-                   
-
-                   <?php endif; ?>
-
-                   
-
-
-
-                  </p>
-
-      </div> 
-
-                     
-
-                  <div class="details_holder"> 
-
-
-
-                  
-
-                  <ul class="project-details1 project-details1_a">
-
-							<li>
-
-								<img src="<?php echo get_bloginfo('template_url'); ?>/images/price.png" width="15" height="15" /> 
-
-								<h3><?php echo __("Budget",'ProjectTheme'); ?>:</h3>
-
-								<p><?php 
-
-								
-
-								  $sel = get_post_meta(get_the_ID(), 'budgets', true);
-
-		  						echo ProjectTheme_get_budget_name_string_fromID($sel);
-
-								
-
-								 ?>
-
-                                
-
-                                </p>
-
-							</li>
-
-                            
-
-                            
-
-                            <li>
-
-								<img src="<?php echo get_bloginfo('template_url'); ?>/images/price.png" width="15" height="15" /> 
-
-								<h3><?php echo __("Winning Bid",'ProjectTheme'); ?>:</h3>
-
-								<p><?php 
-
-								
-
-								$bid = projectTheme_get_winner_bid(get_the_ID());
-
-								echo ProjectTheme_get_show_price($bid->bid);
-
-								  
-
-								
-
-								 ?>
-
-                                
-
-                                </p>
-
-							</li>
-
-					
-
-             				
-
-                            <li>
-
-								<img src="<?php echo get_bloginfo('template_url'); ?>/images/location.png" width="15" height="15" /> 
-
-								<h3><?php echo __("Winner",'ProjectTheme'); ?>:</h3>
-
-								<p><?php 
-
-								
-
-								$winner = get_post_meta(get_the_ID(), 'winner', true);
-
-
-
-								$winner = get_userdata($winner);
-
-								
-
-								echo '<a href="'.ProjectTheme_get_user_profile_link($winner->ID).'">'.$winner->user_login.'</a>';
-
-								
-
-								?></p>
-
-							</li>
-
-                        
-
-
-
-							
-
-                            <li>
-
-								<img src="<?php echo get_bloginfo('template_url'); ?>/images/clock.png" width="15" height="15" /> 
-
-								<h3><?php echo __("Delivery On",'ProjectTheme'); ?>:</h3>
-
-								<p><?php 
-
-								
-
-								$tm_d = get_post_meta(get_the_ID(), 'expected_delivery', true);							
-
-								echo date_i18n('d-M-Y H:i:s', $tm_d);
-
-								
-
-								?></p>
-
-							</li>
-
-							
-
-					
-
-                    
-
-						</ul>
-
-                      
-
-               
-
-                  </div>   
-
-                     
-
-                     </div></div></div> <?php		
-
-	
-
-}
 
 /*************************************************************
 
@@ -13262,7 +12609,6 @@ function ProjectTheme_get_buttons_my_deliv_2 (){
 
                   <?php }   ?>
 
-                  
 
                   <?php if($post->post_author == $uid) //$closed == 1) 
 
@@ -13295,6 +12641,21 @@ function ProjectTheme_get_buttons_my_deliv_2 (){
                    <a href="<?php bloginfo('siteurl') ?>/?p_action=delete_project&pid=<?php the_ID(); ?>" class="green_btn3"><?php echo __("Delete", "ProjectTheme");?></a>
 
                   <?php endif; ?>
+                   
+                                     
+                  <?php /* Add close button if available (winners count = 0 OR paid_user = 1) */ ?>
+
+                  <?php if($post->post_author == $uid) {
+                      $pid = get_the_ID();
+                      $paid_user = get_post_meta($pid, 'paid_user', true);
+                      $winners = Bid::get_field_by_pid($pid, 'winner', $single = false, array('winner=1'));
+                      if(count($winners) == 0 || $paid_user == 1) {
+                          ?>
+                           <a href="<?php bloginfo('siteurl') ?>/?p_action=close_project&pid=<?php the_ID(); ?>" class="orange_btn3"><?php echo __("Close Project", "ProjectTheme");?></a>
+                          <?php
+                      }
+                      
+                  } ?>
 
                   
 
@@ -13364,9 +12725,10 @@ function projectTheme_get_post_outstanding_project_function()
 
 						
 
-	$tm_d 				= get_post_meta(get_the_ID(), 'expected_delivery', true);							
+	$tm_d 				= get_post_meta(get_the_ID(), 'expected_delivery', true);
+    $tm_bid             = Bid::get_by_pid_uid($pid, $current_user->ID)->expected_delivery;
 
-	$due_date 			= sprintf(__('Due Date: %s','ProjectTheme'), date_i18n('d-M-Y g:iA', $tm_d));
+	$due_date 			= sprintf(__('Due Date: %s','ProjectTheme'), date_i18n('d-M-Y g:iA', $tm_bid));
 
 	
 
@@ -13374,11 +12736,13 @@ function projectTheme_get_post_outstanding_project_function()
 
 	  	
 
-		$my_bid = projectTheme_get_bid_by_uid($pid, $current_user->ID); 
+		$bid = projectTheme_get_bid_by_uid($pid, $current_user->ID); 
+        
+        $mark_coder_delivered = Bid::get_field_by_id($bid->id, 'mark_coder_delivered', $single = true);
 
-		$my_bid = projecttheme_get_show_price($my_bid->bid);
+		$my_bid = projecttheme_get_show_price($bid->bid);
 
-		$mark_coder_delivered 	= get_post_meta(get_the_ID(), 'mark_coder_delivered', true);
+//		$mark_coder_delivered 	= get_post_meta(get_the_ID(), 'mark_coder_delivered', true);
 
 	
 
@@ -13638,7 +13002,7 @@ function projectTheme_get_post_outstanding_project_function()
 
            
 
-                            <a href="<?php echo get_bloginfo('siteurl'); ?>/?p_action=mark_delivered&pid=<?php the_ID(); ?>" 
+                            <a href="<?php echo get_bloginfo('siteurl'); ?>/?p_action=mark_delivered&pid=<?= get_the_ID();?>&bid=<?php echo $bid->id; ?>" 
 
                             class="green_btn"><?php echo __("Mark Delivered", "ProjectTheme");?></a>
 
@@ -13690,7 +13054,8 @@ function projectTheme_get_post_outstanding_project_function()
 
                        
 
-                            $dv = get_post_meta(get_the_ID(), 'mark_coder_delivered_date', true);
+//                            $dv = get_post_meta(get_the_ID(), 'mark_coder_delivered_date', true);
+                            $dv = Bid::get_field_by_id($bid->id, 'mark_coder_delivered_date', true);
 
                             $dv = date_i18n('d-M-Y H:i:s',$dv);
 
@@ -13770,357 +13135,6 @@ function projectTheme_get_post_outstanding_project_function()
 
 
 
-function projectTheme_get_post_outstanding_project_function2()
-
-{
-
-	
-
-			$ending 			= get_post_meta(get_the_ID(), 'ending', true);
-
-			$sec 				= $ending - current_time('timestamp',0);
-
-			$location 			= get_post_meta(get_the_ID(), 'Location', true);		
-
-			$closed 			= get_post_meta(get_the_ID(), 'closed', true);
-
-			$featured 			= get_post_meta(get_the_ID(), 'featured', true);
-
-			
-
-			$mark_coder_delivered 			= get_post_meta(get_the_ID(), 'mark_coder_delivered', true);
-
-			$post							= get_post(get_the_ID());
-
-
-
-			
-
-			global $current_user;
-
-			get_currentuserinfo();
-
-			$uid = $current_user->ID;
-
-			
-
-			do_action('ProjectTheme_outstanding_proj_post_before');
-
-			
-
-?>
-
-				<div class="post" id="post-<?php the_ID(); ?>">
-
-                
-
-                <?php if($featured == "1"): ?>
-
-                <div class="featured-one"></div>
-
-                <?php endif; ?>
-
-                
-
-                
-
-                <?php if($private_bids == "yes" or $private_bids == "1"): ?>
-
-                <div class="sealed-one"></div>
-
-                <?php endif; ?>
-
-                
-
-                
-
-                <div class="padd10_only_top">
-
-                <div class="image_holder">
-
-                 <?php
-
-				
-
-				$ProjectTheme_enable_images_in_projects = get_option('ProjectTheme_enable_images_in_projects');
-
-				if($ProjectTheme_enable_images_in_projects == "yes"):
-
-					
-
-					$width 	= 40;
-
-					$height = 32;
-
-					$image_class = "image_class";
-
-					
-
-					
-
-					$width 			= apply_filters("ProjectTheme_outstanding_proj_img_width", 	$width);
-
-					$height 		= apply_filters("ProjectTheme_outstanding_proj_img_height", $height);
-
-					$image_class 	= apply_filters("ProjectTheme_outstanding_proj_img_class", 	$image_class);
-
-					
-
-				?>
-
-                
-
-                <a href="<?php the_permalink(); ?>" title="<?php the_title(); ?>"><img width="<?php echo $width; ?>" height="<?php echo $height; ?>" class="<?php echo $image_class; ?>" 
-
-                src="<?php echo ProjectTheme_get_first_post_image(get_the_ID(),$width,$height); ?>" alt="<?php the_title(); ?>" /></a>
-
-               
-
-               <?php endif; ?>
-
-                </div>
-
-                <div class="title_holder" > 
-
-                     <h2><a class="post-title-class" href="<?php the_permalink() ?>" rel="bookmark" title="<?php the_title(); ?>"><?php 
-
-					 do_action('ProjectTheme_outstanding_proj_title_before');
-
-					 the_title(); 
-
-					 do_action('ProjectTheme_outstanding_proj_title_after');
-
-					 ?></a></h2>
-
-                        
-
-    
-
-                        
-
-                  <p class="mypostedon">
-
-                        <?php _e("Posted in",'ProjectTheme');?>: <?php echo get_the_term_list( get_the_ID(), 'project_cat', '', ', ', '' ); ?> 
-
-                        <?php _e("by",'ProjectTheme');?>: <a href="<?php bloginfo('siteurl'); ?>?p_action=user_profile&post_author=<?php echo $post->post_author; ?>"><?php the_author() ?></a> 
-
-                  </p>
-
-                       
-
-                        
-
-              <p class="task_buttons">   
-
-                    <?php do_action('ProjectTheme_outstanding_proj_buttons'); ?>    
-
-		
-
-       				<?php if($mark_coder_delivered != "1"): ?>
-
-       
-
-                       <?php
-
-					   
-
-					   $cannot_mark_delivered = 0;
-
-								$projectTheme_enable_paypal_ad = get_option('projectTheme_enable_paypal_ad');
-
-									
-
-									if($projectTheme_enable_paypal_ad == "yes")
-
-									{
-
-										$adaptive_done = get_post_meta(get_the_ID(),'adaptive_done',true);
-
-										if(empty($adaptive_done)) $cannot_mark_delivered = 1;
-
-									}
-
-									
-
-									if(!$cannot_mark_delivered)
-
-									{
-
-						?>
-
-           
-
-                            <a href="<?php echo get_bloginfo('siteurl'); ?>/?p_action=mark_delivered&pid=<?php the_ID(); ?>" 
-
-                            class="green_btn"><?php echo __("Mark Delivered", "ProjectTheme");?></a>
-
-                            
-
-                            
-
-                            <?php
-
-							
-
-									} else { echo '<div class="cpts_n1">'; _e('The Project Owner must deposit the money escrow through PayPal before the project starts.','ProjectTheme'); echo '</div>'; }
-
-							?>
-
-                   
-
-				   <?php else: 
-
-				   
-
-				   		$dv = get_post_meta(get_the_ID(), 'mark_coder_delivered_date', true);
-
-				   		$dv = date_i18n('d-M-Y H:i:s',$dv);
-
-				   
-
-				   ?>
-
-                   
-
-                   <span class="zbk_zbk">
-
-                   <?php printf(__("Awaiting buyer response.<br/>Marked as delivered on: %s","ProjectTheme"), $dv); ?>
-
-                   </span>
-
-                   
-
-                   <?php endif; ?>
-
-                   
-
-
-
-                  </p>
-
-      </div> 
-
-                     
-
-                  <div class="details_holder"> 
-
-
-
-                  
-
-                  <ul class="project-details1 project-details1_a">
-
-                  
-
-                  			<?php do_action('ProjectTheme_outstanding_proj_details_before'); ?> 
-
-                  		
-
-                  
-
-							<li>
-
-								<img src="<?php echo get_bloginfo('template_url'); ?>/images/price.png" width="15" height="15" /> 
-
-								<h3><?php echo __("Budget",'ProjectTheme'); ?>:</h3>
-
-								<p><?php 
-
-								
-
-								$sel = get_post_meta(get_the_ID(), 'budgets', true);
-
-		  						echo ProjectTheme_get_budget_name_string_fromID($sel);
-
-								
-
-								 ?>
-
-                                
-
-                                </p>
-
-							</li>
-
-                            
-
-                            
-
-                            <li>
-
-								<img src="<?php echo get_bloginfo('template_url'); ?>/images/price.png" width="15" height="15" /> 
-
-								<h3><?php echo __("Winning Bid",'ProjectTheme'); ?>:</h3>
-
-								<p><?php 
-
-								
-
-								$bid = projectTheme_get_winner_bid(get_the_ID());
-
-								echo ProjectTheme_get_show_price($bid->bid);
-
-								 								
-
-								 ?>
-
-                                
-
-                                </p>
-
-							</li>
-
-					
-
-             
-
-                        
-
-							<li>
-
-								<img src="<?php echo get_bloginfo('template_url'); ?>/images/clock.png" width="15" height="15" /> 
-
-								<h3><?php echo __("Delivery On",'ProjectTheme'); ?>:</h3>
-
-								<p><?php 
-
-								
-
-								$tm_d = get_post_meta(get_the_ID(), 'expected_delivery', true);							
-
-								echo date_i18n('d-M-Y H:i:s', $tm_d);
-
-								
-
-								?></p>
-
-							</li>
-
-							
-
-							<?php do_action('ProjectTheme_outstanding_proj_details_after'); ?> 
-
-                    
-
-						</ul>
-
-                      
-
-               
-
-                  </div>   
-
-                     
-
-                     </div></div></div> <?php	
-
-					 
-
-					 do_action('ProjectTheme_outstanding_proj_post_after');
-
-					 
-
-}
 
 /*************************************************************
 
@@ -14224,21 +13238,24 @@ function projectTheme_get_post_pay_function( $arr = '')
 
 			
 
-			$winner = get_post_meta(get_the_ID(), 'winner', true);
+			$winner = get_post_meta(get_the_ID(), 'winner', false);
+
+            foreach ($winner as &$one) {
+            
+                $one = get_userdata($one);
+                
+                $one = '<a href="'.ProjectTheme_get_user_profile_link($one->ID).'">'.$one->user_login.'</a>';
+            
+            }
 
 
+			if(count($winner) > 1)
 
-			$winner = get_userdata($winner);
-
-			$winner = '<a href="'.ProjectTheme_get_user_profile_link($winner->ID).'">'.$winner->user_login.'</a>';
-
-			if(is_group_winner())
-
-				$winner = sprintf(__("WInner: %s", 'ProjectTheme'), '<a href="">Group</a>' );
+				$winner = sprintf(__("Winners: %s", 'ProjectTheme'), implode(', ', $winner ));
 
 			else
 
-				$winner = sprintf(__("WInner: %s", 'ProjectTheme'), $winner );
+				$winner = sprintf(__("Winner: %s", 'ProjectTheme'), implode(', ', $winner ));
 
 											
 
@@ -14249,8 +13266,30 @@ function projectTheme_get_post_pay_function( $arr = '')
 	$auth = get_userdata($post->post_author); 	 
 
 	$posted = get_the_time("jS F Y");
+    
+            $users_with_escrow_made = array();
+    
+            $awaiting_users = Bid::get_by_pid_uid($post->ID, $uid = '', $single = false, $filters = array("winner='1'", "paid='0'", "outstanding='0'", "delivered='1'"));
 
-	
+            foreach ($awaiting_users as &$one) {
+                
+                        $escrow = Escrow::get_by_field('bid', $one->id);
+                        
+                        $one = get_userdata($one->uid);
+                        
+                        if (isset($escrow) && $escrow->released == 0) {
+                            
+                            $users_with_escrow_made[] = '<a href="'.ProjectTheme_get_user_profile_link($one->ID).'">'.$one->user_login.'</a>';
+
+                        }
+
+                        $one = '<a href="'.ProjectTheme_get_user_profile_link($one->ID).'">'.$one->user_login.'</a>';
+
+                    }
+                    
+            $users_wait_for_escrow = array_values(array_diff($awaiting_users, $users_with_escrow_made));
+            
+            
 
 			
 
@@ -14324,7 +13363,7 @@ function projectTheme_get_post_pay_function( $arr = '')
 
                     	<p><img src="<?php bloginfo('template_url') ?>/images/clock_icon.png" alt="project clock" width="16" height="16" /></p>
 
-                        <h4><?php echo $delivery_on ?></h4>
+                        <h4><?php echo $delivery_on; ?></h4>
 
                     </li>
 
@@ -14346,15 +13385,15 @@ function projectTheme_get_post_pay_function( $arr = '')
 
 					$projecttheme_escrow_was_made_for_project_not_released = projecttheme_escrow_was_made_for_project_not_released(get_the_ID());
 
-					if($projecttheme_escrow_was_made_for_project_not_released == false):
+//					if($projecttheme_escrow_was_made_for_project_not_released == false):
 
 				 
 
 						
 
-							$projectTheme_project_function_filter_adv = true;
+						$projectTheme_project_function_filter_adv = true;
 
-						 $projectTheme_project_function_filter_adv = apply_filters('projectTheme_project_function_filter_adv', get_the_ID());
+						$projectTheme_project_function_filter_adv = apply_filters('projectTheme_project_function_filter_adv', get_the_ID());
 
 						
 
@@ -14398,11 +13437,24 @@ function projectTheme_get_post_pay_function( $arr = '')
 
                         class="green_btn"><?php echo __("Pay This", "ProjectTheme");?></a> -->
 
-
+                                 
+                        <?php 
+                        if (count($users_wait_for_escrow) > 0 ) {
+                        ?>
+                                 <div >
+                                     <span><?php echo sprintf(__('Next users are waiting their payments: %s ', 'ProjectTheme'), implode(', ', $users_wait_for_escrow)); ?></span> 
+                                     
+                                     <a href="<?php echo ProjectTheme_get_payments_page_url_redir('escrow') ?>" class="post_bid_btn"><?php _e('Make Escrow','ProjectTheme') ?></a>
+                                 </div>
+                                     
+                                 
+                                 
+                                 
+                        <?php } ?>
 
                         <br/>
 
-                        <a href="<?php echo ProjectTheme_get_payments_page_url_redir('escrow') ?>" class="post_bid_btn"><?php _e('Make Escrow','ProjectTheme') ?></a>
+                        
 
                         
 
@@ -14410,21 +13462,26 @@ function projectTheme_get_post_pay_function( $arr = '')
 
                    
 
-				<?php } } else: do_action('projectTheme_project_function_filter_1_action', get_the_ID());	endif; else: ?>
-
+				<?php } 
                 
+                        } else: do_action('projectTheme_project_function_filter_1_action', get_the_ID());	endif; ?>
+
+                        <?php // else: ?>
 
                 	<?php 
 
-					
+                if (!empty($users_with_escrow_made)) {
 
 					$kk = ProjectTheme_get_payments_page_url_redir('');
 
-					echo sprintf(__('Escrow was made. <a href="%s" class="green_btn">Go and release it.</a>','ProjectTheme'), $kk); ?>	
+					echo sprintf(__('Escrow was made for next users: %s ', 'ProjectTheme'), implode(', ', $users_with_escrow_made)); ?>
+                        
+                        <a href="<?php echo $kk ?>" class="green_btn"><?php _e('Go and release it.','ProjectTheme'); ?></a>
 
                 
 
-                <?php endif; ?>
+                <?php } ?>
+                <?php // endif; ?>
 
                 
 
@@ -15774,19 +14831,24 @@ if($_POST['redirect_search'] == "freelancers")
 
 			$ar = 1;
 
-			$bids = projectTheme_get_winner_bid($pids,$ar);
+			$bids = Bid::get_by_pid_uid($pids, $uid = '', $single = false, $filters = array("winner='1'", "paid='0'", "outstanding='0'", "delivered='1'"));
+            
+                     
+			echo '<select name="uids" onchange="on_winner_sel();" required="">';
 
-			
+			foreach ($bids as $key => $bid) {	
+                
+                $escrow = Escrow::get_by_field('bid', $bid->id);
+                
+                if (!isset($escrow)) {
+                    
+                    $user = get_userdata($bid->uid);
 
-			echo '<select name="uids">';
+					echo '<option value="'.$bid->uid.'" bid="'.$bid->id.'">'.$user->user_login.'</option>';
 
-			foreach ($bids as $key => $bid) {					
-
-					$user = get_userdata($bid->uid);
-
-					echo '<option value="'.$bid->uid.'">'.$user->user_login.'</option>';
-
-				}	
+                }
+                    
+			}	
 
 				echo "</select>";
 
@@ -16109,6 +15171,16 @@ if($_POST['redirect_search'] == "freelancers")
 	        die();	
 
 		}
+        
+		if ($p_action == "mark_in_progress")
+
+	    {
+
+			get_template_part('lib/my_account/mark_in_progress');
+
+	        die();	
+
+		}
 
 		
 
@@ -16273,6 +15345,16 @@ if($_POST['redirect_search'] == "freelancers")
 	    {
 
 			get_template_part('lib/my_account/delete_project');
+
+	        die();	
+
+		}
+
+		if ($p_action == "close_project")
+
+	    {
+
+			get_template_part('lib/my_account/close_project');
 
 	        die();	
 
@@ -16868,9 +15950,11 @@ function ProjectTheme_new_mail_from_name($old) {
 
 
 
-function ProjectTheme_send_email($recipients, $subject = '', $message = '') {
+function ProjectTheme_send_email($recipients, $subject = '', $message = '', $make_clickable_link = true) {
 
-	/*
+
+    
+    /*
      * copy to 'user-admin' email if recipient - wp_sys_email
      */
     
@@ -16881,7 +15965,7 @@ function ProjectTheme_send_email($recipients, $subject = '', $message = '') {
             
             ProjectTheme_send_email($user_admin_email, $subject, $message);
         }
-
+    
 		
 
 	$ProjectTheme_email_addr_from 	= get_option('ProjectTheme_email_addr_from');	
@@ -16942,9 +16026,26 @@ function ProjectTheme_send_email($recipients, $subject = '', $message = '') {
 
 		if ($html) {
 
-			 
+        if ($make_clickable_link) {
 
-//			$message = projectTheme_makeClickableLinks($message);			
+			$message = projectTheme_makeClickableLinks($message);
+            
+        }
+
+        	/*
+            * add logo to message
+            */
+
+           $logo = get_option('projectTheme_logo_url');
+           if (!empty($logo)) {
+               
+               $site_name = get_bloginfo('name');
+               
+               $message = "<img id='logo' alt='$site_name' src='$logo'><br><br>" . $message;
+
+           }
+        
+		
 
 			$mailtext = "<html><head><title>" . $subject . "</title></head><body>" . nl2br($message) . "</body></html>";
 
@@ -18623,6 +17724,70 @@ function ProjectTheme_send_email_on_completed_project_to_bidder($pid, $bidder_id
 }
 
 
+function ProjectTheme_send_email_in_progress_project_to_bidder($pid, $bidder_id, $reason = '')
+
+{
+
+	$enable 	= get_option('ProjectTheme_in_progress_project_bidder_email_enable');
+
+	$subject 	= get_option('ProjectTheme_in_progress_project_bidder_email_subject');
+
+	$message 	= get_option('ProjectTheme_in_progress_project_bidder_email_message');	
+
+	
+
+	if($enable != "no"):
+
+	
+
+		$post 			= get_post($pid);
+
+		$user 			= get_userdata($bidder_id);
+
+		$site_login_url = ProjectTheme_login_url();
+
+		$site_name 		= get_bloginfo('name');
+
+		$account_url 	= get_permalink(get_option('ProjectTheme_my_account_page_id'));
+        
+        $project_link   = ProjectTheme_get_project_link($pid, true, false);
+
+		$reason         = trim($reason);
+
+
+
+		$find 		= array('##username##', '##site_login_url##', '##your_site_name##', '##your_site_url##' , '##my_account_url##', '##project_name##', '##project_link##', '##reason##');
+
+   		$replace 	= array($user->user_login, $site_login_url, $site_name, get_bloginfo('siteurl'), $account_url, $post->post_title, $project_link, $reason);
+
+		
+
+		$tag		= 'ProjectTheme_send_email_in_progress_project_to_bidder';
+
+		$find 		= apply_filters( $tag . '_find', 	$find );
+
+		$replace 	= apply_filters( $tag . '_replace', $replace );
+
+		
+
+		$message 	= ProjectTheme_replace_stuff_for_me($find, $replace, $message);
+
+		$subject 	= ProjectTheme_replace_stuff_for_me($find, $replace, $subject);
+
+		
+
+		//---------------------------------------------
+
+
+
+		ProjectTheme_send_email($user->user_email, $subject, $message, $make_clickable_link = false);
+
+	
+
+	endif;
+
+}
+
 
 function ProjectTheme_send_email_on_escrow_project_to_bidder($pid, $bidder_id, $es)
 
@@ -18697,6 +17862,77 @@ function ProjectTheme_send_email_on_escrow_project_to_bidder($pid, $bidder_id, $
 *
 
 **************************************************************/
+
+function ProjectTheme_send_email_in_progress_project_to_owner($pid, $bidder_id, $reason = '') // owner = post->post_author
+
+{
+
+	$enable 	= get_option('ProjectTheme_in_progress_project_owner_email_enable');
+
+	$subject 	= get_option('ProjectTheme_in_progress_project_owner_email_subject');
+
+	$message 	= get_option('ProjectTheme_in_progress_project_owner_email_message');	
+
+	
+
+	if($enable != "no"):
+
+	
+
+		$post 			= get_post($pid);
+
+		$user 			= get_userdata($post->post_author);
+
+		$site_login_url = ProjectTheme_login_url();
+
+		$site_name 		= get_bloginfo('name');
+
+		$account_url 	= get_permalink(get_option('ProjectTheme_my_account_page_id'));
+
+		$reason         = trim($reason);
+        
+//        $bidder         = get_userdata($bidder_id);
+        
+        $project_link   = ProjectTheme_get_project_link($pid, true, false);
+        
+        $bidder_link    = ProjectTheme_get_user_profile_link($bidder_id, true, false);
+
+
+
+		$find 		= array('##username##', '##site_login_url##', '##your_site_name##', '##your_site_url##' , '##my_account_url##', '##project_name##', '##project_link##', '##reason##', '##bidder_link##');
+
+   		$replace 	= array($user->user_login, $site_login_url, $site_name, get_bloginfo('siteurl'), $account_url, $post->post_title, $project_link, $reason, $bidder_link);
+
+		
+
+		$tag		= 'ProjectTheme_send_email_in_progress_project_to_owner';
+
+		$find 		= apply_filters( $tag . '_find', 	$find );
+
+		$replace 	= apply_filters( $tag . '_replace', $replace );
+
+		
+
+		$message 	= ProjectTheme_replace_stuff_for_me($find, $replace, $message);
+
+		$subject 	= ProjectTheme_replace_stuff_for_me($find, $replace, $subject);
+
+		
+
+		//---------------------------------------------
+
+		
+
+		ProjectTheme_send_email($user->user_email, $subject, $message, $make_clickable_link = false);
+
+	
+
+	endif;
+
+}
+
+
+
 
 function ProjectTheme_send_email_on_completed_project_to_owner($pid) // owner = post->post_author
 
@@ -19166,7 +18402,7 @@ function ProjectTheme_send_email_on_priv_mess_received($sender_uid, $receiver_ui
 
 		$site_name 		= get_bloginfo('name');
 
-		$account_url 	= projectTheme_makeClickableLinks(get_permalink(get_option('ProjectTheme_my_account_page_id')));
+		$account_url 	= projectTheme_makeClickableLinks(get_permalink(get_option('ProjectTheme_my_account_page_id')) . 'private-messages/');
 
 		$sndr			= get_userdata($sender_uid);
         
@@ -19198,7 +18434,7 @@ function ProjectTheme_send_email_on_priv_mess_received($sender_uid, $receiver_ui
 
 
 
-		ProjectTheme_send_email($user->user_email, $subject, $message);
+		ProjectTheme_send_email($user->user_email, $subject, $message, false);
 
 	
 
@@ -19461,6 +18697,10 @@ function ProjectTheme_send_email_on_win_to_owner($pid, $winner_uid)
 	
 
 		$post 			= get_post($pid);
+    
+        $post_title_with_link = ProjectTheme_get_project_link($pid, true, true);
+
+        $post_link = ProjectTheme_get_project_link($pid);
 
 		$user 			= get_userdata($post->post_author);
 
@@ -19478,7 +18718,7 @@ function ProjectTheme_send_email_on_win_to_owner($pid, $winner_uid)
 
 		$usrnm = get_userdata($winner_uid);
 
-		$winner_bid_username = $usrnm->user_login;
+		$winner_bid_username = ProjectTheme_get_user_profile_link($winner_uid, true,true);
 
 		$winner_bid_value = projecttheme_get_show_price($projectTheme_get_winner_bid->bid);
 
@@ -19488,9 +18728,9 @@ function ProjectTheme_send_email_on_win_to_owner($pid, $winner_uid)
 
 		
 
-		$find 		= array('##username##', '##site_login_url##', '##your_site_name##', '##your_site_url##' , '##my_account_url##', '##project_name##', '##project_link##','##winner_bid_value##','##winner_bid_username##');
+		$find 		= array('##username##', '##site_login_url##', '##your_site_name##', '##your_site_url##' , '##my_account_url##', '##project_name##', '##project_title##', '##project_link##','##winner_bid_value##','##winner_bid_username##');
 
-   		$replace 	= array($user->user_login, $site_login_url, $site_name, get_bloginfo('siteurl'), $account_url, $post->post_title, get_permalink($pid),
+   		$replace 	= array($user->user_login, $site_login_url, $site_name, get_bloginfo('siteurl'), $account_url, $post->post_title, $post_title_with_link, $post_link,
 
 		$winner_bid_value,$winner_bid_username );
 
@@ -19514,7 +18754,7 @@ function ProjectTheme_send_email_on_win_to_owner($pid, $winner_uid)
 
 
 
-		ProjectTheme_send_email($user->user_email, $subject, $message);
+		ProjectTheme_send_email($user->user_email, $subject, $message, false);
 
 	
 
@@ -19549,6 +18789,8 @@ function ProjectTheme_send_email_on_win_to_bidder($pid, $winner_uid)
 	
 
 		$post 			= get_post($pid);
+    
+        $post_title     = ProjectTheme_get_project_link ($pid, true, true);
 
 		$user 			= get_userdata($winner_uid);
 
@@ -19557,6 +18799,8 @@ function ProjectTheme_send_email_on_win_to_bidder($pid, $winner_uid)
 		$site_name 		= get_bloginfo('name');
 
 		$account_url 	= get_permalink(get_option('ProjectTheme_my_account_page_id'));
+        
+        $messenger_link = $account_url . 'private-messages/';
 
 		
 
@@ -19570,9 +18814,9 @@ function ProjectTheme_send_email_on_win_to_bidder($pid, $winner_uid)
 
 		
 
-		$find 		= array('##username##', '##username_email##', '##site_login_url##', '##your_site_name##', '##your_site_url##' , '##my_account_url##', '##project_name##', '##project_link##','##winner_bid_value##');
+		$find 		= array('##username##', '##username_email##', '##site_login_url##', '##your_site_name##', '##your_site_url##' , '##my_account_url##', '##messenger_link##', '##project_name##', '##project_title##','##project_link##','##winner_bid_value##');
 
-   		$replace 	= array($user->user_login, $user->user_email, $site_login_url, $site_name, get_bloginfo('siteurl'), $account_url, $post->post_title, get_permalink($pid), $winner_bid_value);
+   		$replace 	= array($user->user_login, $user->user_email, $site_login_url, $site_name, get_bloginfo('siteurl'), $account_url, $messenger_link, $post->post_title, $post_title ,get_permalink($pid), $winner_bid_value);
 
 		 
 
@@ -19594,7 +18838,7 @@ function ProjectTheme_send_email_on_win_to_bidder($pid, $winner_uid)
 
 
 
-		ProjectTheme_send_email($user->user_email, $subject, $message);
+		ProjectTheme_send_email($user->user_email, $subject, $message, false);
 
 	
 
@@ -19672,7 +18916,7 @@ function ProjectTheme_send_email_when_bid_project_bidder($pid, $uid, $bid)
 
 		
 
-		ProjectTheme_send_email($user->user_email, $subject, $message);
+		ProjectTheme_send_email($user->user_email, $subject, $message, false);
 
 	
 
@@ -19724,8 +18968,8 @@ function ProjectTheme_send_email_when_bid_project_owner($pid, $uid, $bid)
 
 		$bid_val		= ProjectTheme_get_show_price($bid);
 
-		$bidder_username = $bidder->user_login;
-
+		$bidder_username = ProjectTheme_get_user_profile_link($uid, $bidder->user_login, $bold = true);
+        
 		$author			= get_userdata($post->post_author);
 
 		
@@ -19756,7 +19000,7 @@ function ProjectTheme_send_email_when_bid_project_owner($pid, $uid, $bid)
 
 
 
-		ProjectTheme_send_email($author->user_email, $subject, $message);
+		ProjectTheme_send_email($author->user_email, $subject, $message, false);
 
 	
 
@@ -21390,7 +20634,7 @@ if ($pagenow == 'wp-login.php') {
     
     remove_filter( 'authenticate', 'wp_authenticate_username_password' );
     add_filter( 'authenticate', 'ProjectTheme_authenticate_username_password', 20, 3 );
-
+    
 }
 
 /*

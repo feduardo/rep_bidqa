@@ -1,0 +1,27 @@
+<?php
+
+class Escrow {
+    
+    public static function get_by_field($field, $value, $single = true, $filters = '') {
+        global $wpdb;
+        
+        $where = "WHERE $field = '$value' ";
+        
+        $where = ($filters)? $where . " AND " . implode(" AND ", $filters) : $where;
+        
+        $query = 'SELECT * FROM '. $wpdb->prefix . 'project_escrow '
+                . $where;
+        
+        $r = $wpdb->get_results($query);
+        
+        if ($single) {
+            return $r[0]; 
+        } else {
+            return $r;
+        }
+    }
+    
+    
+    
+}
+

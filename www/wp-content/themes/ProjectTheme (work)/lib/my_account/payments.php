@@ -59,6 +59,10 @@ function ProjectTheme_my_account_payments_area_function()
 					if($_GET['pg'] == 'releasepayment')
 					{
 						$id = $_GET['id'];
+                        
+                        $escrow = Escrow::get_by_field('id', $id);
+                        
+                        $bid = Bid::get_by_id($escrow->bid);
 						
 						$s = "select * from ".$wpdb->prefix."project_escrow where id='$id' AND fromid='$uid'";
 						$r = $wpdb->get_results($s);
@@ -129,10 +133,25 @@ function ProjectTheme_my_account_payments_area_function()
 							//($usr->user_email, $subject , $message);
 							
 							//-----------------------------
+                            /*
+                             * Update bid and project meta
+                             */
+                            
+                            
 							$tm = current_time('timestamp',0);
+							if (!empty($bid)) {
+                                
+                                Bid::update_meta_by_id($bid->id, 'paid',	"1");
+                                Bid::update_meta_by_id($bid->id, 'paid_user_date',	$tm);
+                                
+                                Project::update_postmeta($bid->pid, 'paid_user');
+                            
+                            } else {
+                                // for old projects
+                                update_post_meta($pid,'paid_user','1');
+                                update_post_meta($pid,'paid_user_date',current_time('timestamp',0));
+                            }
 							
-							update_post_meta($pid,'paid_user','1');
-							update_post_meta($pid,'paid_user_date',current_time('timestamp',0));
 							
 							$s = "update ".$wpdb->prefix."project_escrow set released='1', releasedate='$tm' where id='$id'";
 							$r = $wpdb->query($s);
@@ -431,6 +450,7 @@ function ProjectTheme_my_account_payments_area_function()
 				{
 					$amount 	= $_POST['amount'];
 					$projects 	= $_POST['projectss'];					
+					$bid_id 	= $_POST['bid_id'];					
 
 					/*$amount_and_ids = explode(',', $_POST['amount_and_ids']);
 					$amount = $amount_and_ids[0]*1;					*/
@@ -453,7 +473,9 @@ function ProjectTheme_my_account_payments_area_function()
 						else
 						{
 							$post 	= get_post($projects);
-							$uid2   = get_post_meta($projects, "winner", true);
+//							$uid2   = get_post_meta($projects, "winner", true);
+							$bid    = Bid::get_by_id($bid_id);
+                            $uid2   = $bid->uid;
 							
 							$tm = $_POST['tm'];
 							if(empty($tm)) $tm = current_time('timestamp',0);
@@ -478,14 +500,14 @@ function ProjectTheme_my_account_payments_area_function()
 	
 							//($usr->user_email, $subject , $message);
 							
-							$s = "select * from ".$wpdb->prefix."project_escrow where datemade='$tm' and fromid='$uid'";
+							$s = "select * from ".$wpdb->prefix."project_escrow where datemade='$tm' and fromid='$uid' AND bid='$bid->id'";
 							$rr = $wpdb->get_results($s);
 							
 							if(count($rr) == 0)
 							{
 							
-								$s = "insert into ".$wpdb->prefix."project_escrow (datemade, amount, fromid, toid, pid) 
-								values('$tm','$amount','$uid','$uid2','$projects')";
+								$s = "insert into ".$wpdb->prefix."project_escrow (datemade, amount, fromid, toid, pid, bid) 
+								values('$tm','$amount','$uid','$uid2','$projects', '$bid->id')";
 								$wpdb->query($s);
 								
 									// for logged in user, the user who sends
@@ -542,15 +564,20 @@ function ProjectTheme_my_account_payments_area_function()
 							/*jQuery("#my_escrow_amount").html(currency  + data);
 							jQuery("#amount").val(data);*/
 							jQuery("#win_providers").html(data);
+                            on_winner_sel();
 							
 					
 							
 						}
 					});
-					
-			 
-					
 				}
+                
+                function on_winner_sel(){
+                    var uid = jQuery('select[name=uids]').val();
+                    var bid = jQuery('select[name=uids]').children('option[value='+uid+']').attr('bid');
+                    jQuery('#bid_id').val(bid);
+                
+                }
 				
 				<?php 
 					
@@ -577,7 +604,7 @@ function ProjectTheme_my_account_payments_area_function()
                 
                 
     				<br /><br />
-                    <form id="make_esc_providers" name="form1" method="post" onsubmit="return vali();" action="">
+                    <form id="make_esc_providers" name="form1" method="post" onsubmit="on_winner_sel(); return vali();" action="">
                     <table>
                     
                     <input type="hidden" value="<?php echo current_time('timestamp',0) ?>" name="tm" />
@@ -595,7 +622,7 @@ function ProjectTheme_my_account_payments_area_function()
                     </tr>
                     
                     <tr>
-                    <td></td>
+                    <td> <input hidden id="bid_id" name="bid_id" value=""/> </td>
                     <td>
                     <input type="submit" name="escrowme"   value="<?php _e('Make Escrow','ProjectTheme'); ?>" /></td></tr></table></form>
     
@@ -831,6 +858,19 @@ function ProjectTheme_my_account_payments_area_function()
                     			$('select[name="projectss"]').val('');
                     		});
                     	});
+                        
+//                        $(document).ready(function(){
+//                            $('#form1').submit(function() {
+//                                var text = $('input[name="username"]').val();
+//                                var sel = $('select[name="projectss"]').val();
+//                                var sel_text = $('option[value="'+$(this).val()+'"]').text();
+//                                if (sel != '' && sel_text != text){
+//                                    alert("<?php // _e("You cannot send payments to multiple different users at the same time.","ProjectTheme"); ?>");
+//                                    return false;
+//                                }
+//                                return true; // return false to cancel form action
+//                            });
+//                        });
                     </script>
                     <tr>
                     <td></td>
@@ -1296,33 +1336,32 @@ function ProjectTheme_my_account_payments_area_function()
 		
 		
         	$(document).ready(function(){
-        		$('input[name="deposit"]').click(function(ev){
-        			ev.preventDefault();
-        			var amount = $(this).parent().find('input[name="amount"]').val();
-        			console.log(amount);
-        			if (amount>0){
-						
-        				$(this).parent().submit();
-        			}
-        			else{
-        				$(this).prev().css('border-color','red');
-        			}
-					}
-        		});
+            		$('input[name="deposit"]').click(function(ev){
+            			ev.preventDefault();
+            			var amount = $(this).parent().find('input[name="amount"]').val();
+            			console.log(amount);
+            			if (amount>0){
+    						
+            				$(this).parent().submit();
+            			}
+            			else{
+            				$(this).prev().css('border-color','red');
+            			}
+    				});
 
-        		$( 'input[name="amount"]' ).keypress(function( event ) {
-        		  var kk = event.which;
-        		  console.log(kk);
-        		  
-        		  if((kk>47 && kk<58) || kk==13 || kk==0 || kk==8 || kk==46){
-        		  	return true;
-        		  }
-        		  else{
-        		  	return false;
-        		  }
-        		  
-        		});
-        	});
+            		$( 'input[name="amount"]' ).keypress(function( event ) {
+            		  var kk = event.which;
+            		  console.log(kk);
+            		  
+            		  if((kk>47 && kk<58) || kk==13 || kk==0 || kk==8 || kk==46){
+            		  	return true;
+            		  }
+            		  else{
+            		  	return false;
+            		  }
+            		  
+            		});
+            	});
         </script>
         
         <?php ProjectTheme_get_users_links(); ?>

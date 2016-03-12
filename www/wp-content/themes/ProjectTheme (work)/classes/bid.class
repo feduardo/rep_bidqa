@@ -1,0 +1,124 @@
+<?php
+
+
+
+class Bid {
+
+    public static function get_by_id($id) {
+        
+        global $wpdb;
+
+        $s = "SELECT * FROM ".$wpdb->prefix."project_bids WHERE id='$id'";
+        
+        $r = $wpdb->get_results($s);
+        
+        return $r[0];
+    }
+    
+    
+    public static function get_by_pid_uid($pid, $uid = '', $single = true, $filters = array()) {
+
+        global $wpdb;
+
+        $s = "SELECT * FROM ".$wpdb->prefix."project_bids WHERE pid='$pid'";
+        
+        if ($uid) {
+            $s .=  " AND uid='$uid'";
+        }
+        
+        $s = ($filters)? $s . " AND " . implode(" AND ", $filters) : $s;
+
+        $r = $wpdb->get_results($s);
+        
+        if ($single) {
+            return $r[0];	
+        } else {
+            return $r;
+        }
+
+    }
+    
+    public static function update_meta($pid, $uid, $meta, $value) {
+        
+        global $wpdb;
+        
+        $q = "UPDATE ".$wpdb->prefix."project_bids SET `$meta` = '$value' WHERE `pid` = '$pid' AND `uid` = '$uid';";
+        
+        $wpdb->query($q);
+        
+    }
+    
+    public static function update_meta_by_id($id, $meta, $value) {
+        
+        global $wpdb;
+        
+        $q = "UPDATE ".$wpdb->prefix."project_bids SET `$meta` = '$value' WHERE `id` = '$id';";
+        
+        $wpdb->query($q);
+        
+    }
+    
+    public static function get_field($field, $where = '', $single = false) {
+        
+        global $wpdb;
+                
+        $q = "SELECT $field FROM ".$wpdb->prefix."project_bids $where";
+        
+        $res = $wpdb->get_col($q);
+        
+        if ($single) {
+            return $res[0];
+        } else {
+            return $res;
+        }
+    
+    }
+    
+    public static function get_field_by_pid($pid, $field, $single = false, $filters = array()) {
+        $where = ($filters)? "WHERE pid = '$pid' AND " . implode(" AND ", $filters) : "WHERE pid = '$pid'";
+        return self::get_field($field, $where, $single);
+    }
+    
+    public static function get_field_by_id($id, $field, $single = false, $filters = array()) {
+        $where = ($filters)? "WHERE pid = '$pid' AND " . implode(" AND ", $filters) : "WHERE id = '$id'";
+        return self::get_field($field, $where, $single);
+    }
+    
+    
+    public static function get_status ($bid) {
+        
+        $STATUS_ERROR = array('id' => 0, 'name' => __('Error', 'ProjectTheme'));
+        $STATUS_PROPOSAL = array('id' => 1, 'name' => __('Proposal', 'ProjectTheme'));
+        $STATUS_IN_PROGRESS = array('id' => 2, 'name' => __('In Progress', 'ProjectTheme'));
+        $STATUS_AWAITING_COMPLETION = array('id' => 3, 'name' => __('Awaiting Completion', 'ProjectTheme'));
+        $STATUS_AWAITING_PAYMENT = array('id' => 4, 'name' => __('Awaiting Payment', 'ProjectTheme'));
+        $STATUS_AWAITING_PAYMENT_CONFIRM = array('id' => 5, 'name' =>  __('Awaiting Payment Confirm', 'ProjectTheme'));
+        $STATUS_PAYMENT_COMPLETED = array('id' => 6, 'name' => __('Payment Completed', 'ProjectTheme'));
+        
+        if (is_string($bid)) {
+            $bid = Bid::get_by_id($bid);
+        }
+        $escrow = Escrow::get_by_field('bid', $bid->id);
+        
+        if ($bid->winner == 0) {
+            $status = $STATUS_PROPOSAL;
+        } elseif ($bid->winner == 1 && $bid->mark_coder_delivered == 0) {
+            $status = $STATUS_IN_PROGRESS;
+        } elseif ($bid->outstanding == 1 && $bid->mark_coder_delivered == 1) {
+            $status = $STATUS_AWAITING_COMPLETION;
+        } elseif ($bid->delivered == 1 && empty($escrow)) {
+            $status = $STATUS_AWAITING_PAYMENT;
+        } elseif ($bid->delivered == 1 && $escrow->released == 0) {
+            $status = $STATUS_AWAITING_PAYMENT_CONFIRM;
+        } elseif ($bid->paid == 1) {
+            $status = $STATUS_PAYMENT_COMPLETED;
+        } else {
+            $status = $STATUS_ERROR;
+        }
+            
+        return $status;
+        
+    }
+    
+    
+}

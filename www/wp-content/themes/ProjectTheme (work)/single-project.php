@@ -1482,8 +1482,31 @@ codeAddress("<?php
 				
 			<a href="<?php echo get_bloginfo('siteurl'); ?>/?p_action=edit_project&pid=<?php the_ID(); ?>" class="nice_link"><?php _e("Edit",'ProjectTheme'); ?></a> 
 			<a href="<?php echo get_bloginfo('siteurl'); ?>/?p_action=repost_project&pid=<?php the_ID(); ?>" class="nice_link"><?php _e("Repost",'ProjectTheme'); ?></a> 
-		<!--	<a href="<?php echo get_bloginfo('siteurl'); ?>/?p_action=delete_project&pid=<?php the_ID(); ?>" class="nice_link"><?php _e("Delete",'ProjectTheme'); ?></a> -->
-			
+            
+                               
+                  <?php /* Add close button if available (winners count = 0 OR paid_user = 1) */ ?>
+
+                  <?php if($post->post_author == $uid) {
+                      $pid = get_the_ID();
+                      $paid_user = get_post_meta($pid, 'paid_user', true);
+                      $winners = Bid::get_field_by_pid($pid, 'winner', $single = false, array('winner=1'));
+                      if(count($winners) == 0 || $paid_user == 1) {
+                          ?>
+                           <a href="<?php bloginfo('siteurl') ?>/?p_action=close_project&pid=<?php the_ID(); ?>" class="orange_btn3"><?php echo __("Close Project", "ProjectTheme");?></a>
+                          <?php
+                      }
+                      
+                  } ?>
+                           
+                           <?php
+					$winner = get_post_meta(get_the_ID(),'winner', true);
+
+					if(empty($winner)):
+					?>
+            
+                    <a href="<?php echo get_bloginfo('siteurl'); ?>/?p_action=delete_project&pid=<?php the_ID(); ?>" class="green_btn3"><?php _e("Delete",'ProjectTheme'); ?></a> 
+                               <?php endif; ?>
+                           
 			<?php } else {?>
 			
 			<a href="#" id="report-this-link" class="nice_link"><?php _e("Report",'ProjectTheme'); ?></a>

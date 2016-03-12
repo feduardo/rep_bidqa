@@ -28,11 +28,22 @@ function ProjectTheme_my_account_area_awaiting_completion_function()
 			
 		
 					
-				$outstanding = array(
+				$outstanding = array( 
+                    array(
 						'key' => 'outstanding',
 						'value' => "1",
 						'compare' => '='
+                        ),
+                    
+                    array(
+						'key' => 'mark_coder_delivered',
+						'value' => "1",
+						'compare' => '='
+                        ),
+                    
 					);	
+                
+                
 				
 				$args = array('post_type' => 'project', 'author' => $uid, 'order' => 'DESC', 'orderby' => 'date', 'posts_per_page' => $post_per_page,
 				'paged' => $query_vars['paged'], 'meta_query' => array($outstanding));

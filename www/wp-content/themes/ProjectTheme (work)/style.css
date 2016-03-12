@@ -1695,6 +1695,19 @@ a.trm_sk:hover
 	width:100%	
 
 }
+.center {
+    text-align: center;
+}
+
+
+.th-center{
+    font-weight: bold;
+    text-align: center;
+}
+.th-left{
+    font-weight: bold;
+    text-align: left;
+}
 
 
 
@@ -5691,8 +5704,8 @@ a.post_bid_btn_new:link, a.post_bid_btn_new:visited {
 
 font-size: 15px;
 
-/*color: #fff;*/
-color: #3CAADD;
+color: #fff;
+/*color: #3CAADD;*/
 
  
 
@@ -6475,8 +6488,8 @@ padding: 12px 15px;
 
 font-size: 15px;
 
-/*color: #fff;*/
-color: #3CAADD;
+color: #fff;
+/*color: #3CAADD;*/
 
  
 
@@ -6701,7 +6714,12 @@ a.green_btn:link, a.green_btn:visited {
  a.green_btn:link.block{
 
  	display: block;
+        
+ }
+ a.green_btn:link.inline-block{
 
+ 	display: inline-block;
+        
  }
 
  
@@ -6715,6 +6733,70 @@ a.green_btn:hover
 		
 
 		background:#3CAADD;
+
+		text-shadow: none ;
+
+		color:#fff;
+
+		text-decoration:none;
+
+}
+a.grey_btn:link, a.grey_btn:visited {
+
+  
+
+	border:0;
+
+	padding: 6px 15px;
+
+	font-size: 13px;
+
+	color: #000;
+
+	 border-radius:5px;
+
+	background: lightgrey;
+
+	border-bottom: 2px solid grey;
+
+	text-transform:capitalize;
+
+	text-decoration: none;
+
+	font-weight:500;
+
+	font-family: 'Bitter',Arial, Helvetica, sans-serif;
+
+	margin-bottom:20px;
+
+	/*display:block;*/
+
+	
+
+}
+
+ a.grey_btn:link.block{
+
+ 	display: block;
+        
+ }
+ a.grey_btn:link.inline-block{
+
+ 	display: inline-block;
+        
+ }
+
+ 
+
+
+
+a.grey_btn:hover
+
+{
+
+		
+
+		background: grey;
 
 		text-shadow: none ;
 
@@ -6813,6 +6895,65 @@ a.green_btn3:hover
 		
 
 		background:#333;
+
+		text-shadow: none ;
+
+		color:#fff;
+
+		text-decoration:none;
+
+}
+
+
+a.orange_btn3:link, a.orange_btn3:visited {
+
+  
+
+	display: inline-block;  
+
+	position: relative;
+
+	cursor: pointer;
+
+	margin-left:2px; 
+
+	margin-bottom:6px;	
+
+	padding: 1px 5px 1px 5px; 
+
+	font-size: 11px;
+
+	color: #000;
+
+	 
+
+	background: lightsalmon;
+
+	border-bottom: 2px solid salmon;
+
+	text-transform: capitalize;
+
+	text-decoration: none;
+
+	font-family: 'Raleway',Arial, Helvetica, sans-serif;
+
+ 
+
+	
+
+}
+
+ 
+
+
+
+a.orange_btn3:hover
+
+{
+
+		
+
+		background: salmon;
 
 		text-shadow: none ;
 

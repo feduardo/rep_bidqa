@@ -4531,6 +4531,15 @@ function projectTheme_email_settings()
 		echo '<div class="saved_thing">'.__('Settings saved!','ProjectTheme').'</div>';		
 	}
 	
+	if(isset($_POST['ProjectTheme_in_progress_project_owner_email_save']))
+	{
+		update_option('ProjectTheme_in_progress_project_owner_email_enable', 	trim($_POST['ProjectTheme_in_progress_project_owner_email_enable']));
+		update_option('ProjectTheme_in_progress_project_owner_email_subject', 	trim($_POST['ProjectTheme_in_progress_project_owner_email_subject']));
+		update_option('ProjectTheme_in_progress_project_owner_email_message', 	trim($_POST['ProjectTheme_in_progress_project_owner_email_message']));
+		
+		echo '<div class="saved_thing">'.__('Settings saved!','ProjectTheme').'</div>';		
+	}
+	
 	if(isset($_POST['ProjectTheme_delivered_project_owner_email_save']))
 	{
 		update_option('ProjectTheme_delivered_project_owner_email_enable', 		trim($_POST['ProjectTheme_delivered_project_owner_email_enable']));
@@ -4604,6 +4613,11 @@ function projectTheme_email_settings()
             
             <li><a href="#completed_project_owner"><?php _e('Completed Project (owner)','ProjectTheme'); ?></a></li>
             <li><a href="#completed_project_bidder"><?php _e('Completed Project (bidder)','ProjectTheme'); ?></a></li>
+            
+            <!-- #### -->
+            
+            <li><a href="#in_progress_project_owner"><?php _e('In Progress Project (owner)','ProjectTheme'); ?></a></li>
+            <li><a href="#in_progress_project_bidder"><?php _e('In Progress Project (bidder)','ProjectTheme'); ?></a></li>
             
             
             <li><a href="#priv_mess_received"><?php _e('Private Message Received','ProjectTheme'); ?></a></li>
@@ -4879,6 +4893,135 @@ function projectTheme_email_settings()
                     <td ></td>
                     <td ></td>
                     <td><input type="submit"  class="button button-primary button-large" name="ProjectTheme_completed_project_bidder_email_save" 
+                    value="<?php _e('Save Options','ProjectTheme'); ?>"/></td>
+                    </tr>
+            
+            </table>
+            </form>
+          	
+          </div>
+        
+        <!-- ################################ -->
+        <div id="in_progress_project_owner">	
+          
+           <div class="spntxt_bo"><?php _e('This email will be received by the owner of the project when the provider marks the project as still in progress. 
+          Be aware, if you add html tags to this email you must have the allow HTML tags option set to yes.
+          Also at the bottom you can see a list of tags you can use in the email body.','ProjectTheme'); ?> </div>
+          
+          
+          <form method="post" action="<?php echo get_admin_url(); ?>admin.php?page=email-settings&active_tab=in_progress_project_owner">
+            <table width="100%" class="sitemile-table">
+    				
+                    
+                    <tr>
+                    <td valign=top width="22"><?php ProjectTheme_theme_bullet(); ?></td>
+                    <td ><?php _e('Enable this email:','ProjectTheme'); ?></td>
+                    <td><?php echo ProjectTheme_get_option_drop_down($arr, 'ProjectTheme_in_progress_project_owner_email_enable'); ?></td>
+                    </tr>
+                    
+            	  	<tr>
+                    <td valign=top width="22"><?php ProjectTheme_theme_bullet(); ?></td>
+                    <td width="160"><?php _e('Email Subject:','ProjectTheme'); ?></td>
+                    <td><input type="text" size="90" name="ProjectTheme_in_progress_project_owner_email_subject" value="<?php echo stripslashes(get_option('ProjectTheme_in_progress_project_owner_email_subject')); ?>"/></td>
+                    </tr>
+                    
+
+                    
+                    <tr>
+                    <td valign=top><?php ProjectTheme_theme_bullet(); ?></td>
+                    <td valign=top ><?php _e('Email Content:','ProjectTheme'); ?></td>
+                    <td><textarea cols="92" rows="10" name="ProjectTheme_in_progress_project_owner_email_message"><?php echo stripslashes(get_option('ProjectTheme_in_progress_project_owner_email_message')); ?></textarea></td>
+                    </tr>
+                    
+                    
+                    
+                    <tr>
+                    <td valign=top></td>
+                    <td valign=top ></td>
+                    <td><div class="spntxt_bo2">
+                    <?php _e('Here is a list of tags you can use in this email:','ProjectTheme'); ?><br/><br/>
+                    
+   					<strong>##username##</strong> - <?php _e('Project Owner\'s Username','ProjectTheme'); ?><br/>
+                    <strong>##site_login_url##</strong> - <?php _e('the link to your user login page','ProjectTheme'); ?><br/>
+                    <strong>##your_site_name##</strong> - <?php _e("your website's name","ProjectTheme"); ?><br/>
+                    <strong>##your_site_url##</strong> - <?php _e("your website's main address",'ProjectTheme'); ?><br/>
+                    <strong>##my_account_url##</strong> - <?php _e("your website's my account link",'ProjectTheme'); ?><br/>
+                    <strong>##project_name##</strong> - <?php _e("new new project's title",'ProjectTheme'); ?><br/>
+                    <strong>##project_link##</strong> - <?php _e('link for the new project','ProjectTheme'); ?><br/>
+                    <strong>##reason##</strong> - <?php _e('text of reason by project owner','ProjectTheme'); ?><br/>
+                
+                    </div></td>
+                    </tr>
+            		
+                    <tr>
+                    <td ></td>
+                    <td ></td>
+                    <td><input type="submit"  class="button button-primary button-large" name="ProjectTheme_in_progress_project_owner_email_save" 
+                    value="<?php _e('Save Options','ProjectTheme'); ?>"/></td>
+                    </tr>
+            
+            </table>
+            </form>
+          	
+          </div>
+        
+        <!-- ################################ -->
+        <div id="in_progress_project_bidder">	
+          
+           <div class="spntxt_bo"><?php _e('This email will be received by the provider/bidder when he marks the project as in progress. 
+          Be aware, if you add html tags to this email you must have the allow HTML tags option set to yes.
+          Also at the bottom you can see a list of tags you can use in the email body.','ProjectTheme'); ?> </div>
+          
+          
+          <form method="post" action="<?php echo get_admin_url(); ?>admin.php?page=email-settings&active_tab=in_progress_project_bidder">
+            <table width="100%" class="sitemile-table">
+    				
+                    
+                    <tr>
+                    <td valign=top width="22"><?php ProjectTheme_theme_bullet(); ?></td>
+                    <td ><?php _e('Enable this email:','ProjectTheme'); ?></td>
+                    <td><?php echo ProjectTheme_get_option_drop_down($arr, 'ProjectTheme_in_progress_project_bidder_email_enable'); ?></td>
+                    </tr>
+                    
+            	  	<tr>
+                    <td valign=top width="22"><?php ProjectTheme_theme_bullet(); ?></td>
+                    <td width="160"><?php _e('Email Subject:','ProjectTheme'); ?></td>
+                    <td><input type="text" size="90" name="ProjectTheme_in_progress_project_bidder_email_subject" value="<?php echo stripslashes(get_option('ProjectTheme_in_progress_project_bidder_email_subject')); ?>"/></td>
+                    </tr>
+                    
+
+                    
+                    <tr>
+                    <td valign=top><?php ProjectTheme_theme_bullet(); ?></td>
+                    <td valign=top ><?php _e('Email Content:','ProjectTheme'); ?></td>
+                    <td><textarea cols="92" rows="10" name="ProjectTheme_in_progress_project_bidder_email_message"><?php echo stripslashes(get_option('ProjectTheme_in_progress_project_bidder_email_message')); ?></textarea></td>
+                    </tr>
+                    
+                    
+                    
+                    <tr>
+                    <td valign=top></td>
+                    <td valign=top ></td>
+                    <td><div class="spntxt_bo2">
+                    <?php _e('Here is a list of tags you can use in this email:','ProjectTheme'); ?><br/><br/>
+                    
+   					<strong>##username##</strong> - <?php _e('Bidder\'s Username','ProjectTheme'); ?><br/>
+                    <strong>##site_login_url##</strong> - <?php _e('the link to your user login page','ProjectTheme'); ?><br/>
+                    <strong>##your_site_name##</strong> - <?php _e("your website's name","ProjectTheme"); ?><br/>
+                    <strong>##your_site_url##</strong> - <?php _e("your website's main address",'ProjectTheme'); ?><br/>
+                    <strong>##my_account_url##</strong> - <?php _e("your website's my account link",'ProjectTheme'); ?><br/>
+                    <strong>##project_name##</strong> - <?php _e("new new project's title",'ProjectTheme'); ?><br/>
+                    <strong>##project_link##</strong> - <?php _e('link for the new project','ProjectTheme'); ?><br/>
+                    <strong>##reason##</strong> - <?php _e('text of reason by project owner','ProjectTheme'); ?><br/>
+
+                
+                    </div></td>
+                    </tr>
+            		
+                    <tr>
+                    <td ></td>
+                    <td ></td>
+                    <td><input type="submit"  class="button button-primary button-large" name="ProjectTheme_in_progress_project_bidder_email_save" 
                     value="<?php _e('Save Options','ProjectTheme'); ?>"/></td>
                     </tr>
             

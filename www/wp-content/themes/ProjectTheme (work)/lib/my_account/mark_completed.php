@@ -12,6 +12,7 @@ if(!is_user_logged_in()) { wp_redirect(get_bloginfo('siteurl')."/wp-login.php");
 
 	global $wpdb,$wp_rewrite,$wp_query;
 	$pid = $wp_query->query_vars['pid'];
+    $bid = Bid::get_by_id($wp_query->query_vars['bid']);
 
 	global $current_user;
 	get_currentuserinfo();
@@ -28,21 +29,31 @@ if(!is_user_logged_in()) { wp_redirect(get_bloginfo('siteurl')."/wp-login.php");
 	if(isset($_POST['yes']))
 	{
 		$tm = current_time('timestamp',0);
-		$mark_seller_accepted = get_post_meta($pid, 'mark_seller_accepted', true);
+//		$mark_seller_accepted = get_post_meta($pid, 'mark_seller_accepted', true);
+		$mark_seller_accepted = Bid::get_field_by_id($bid->id, 'mark_seller_accepted', true);
 		
 		if(empty($mark_seller_accepted))
 		{
 			
-			update_post_meta($pid, 'mark_seller_accepted',		"1");
-
+//			update_post_meta($pid, 'mark_seller_accepted',		"1");
+            Bid::update_meta_by_id($bid->id, 'mark_seller_accepted',	"1");
+            Bid::update_meta_by_id($bid->id, 'mark_seller_accepted_date',	$tm);
+            
 			/////my_edits
-			update_post_meta($pid, 'closed',		"1");
+//			update_post_meta($pid, 'closed',		"1");
 			////
-			update_post_meta($pid, 'mark_seller_accepted_date',		$tm);
+//			update_post_meta($pid, 'mark_seller_accepted_date',		$tm);
 			
 			
-			update_post_meta($pid, 'outstanding',	"0");
-			update_post_meta($pid, 'delivered',		"1");		
+//			update_post_meta($pid, 'outstanding',	"0");
+//			update_post_meta($pid, 'delivered',		"1");
+            Bid::update_meta_by_id($bid->id, 'outstanding',	"0");
+            Bid::update_meta_by_id($bid->id, 'delivered',	"1");
+            
+            //update postmeta project
+            Project::update_postmeta($pid, 'mark_seller_accepted');
+            Project::update_postmeta($pid, 'outstanding');
+            Project::update_postmeta($pid, 'delivered');
 			
 			//------------------------------------------------------------------------------
 			$projectTheme_get_winner_bid = projectTheme_get_winner_bid($pid);
@@ -99,6 +110,7 @@ if(!is_user_logged_in()) { wp_redirect(get_bloginfo('siteurl')."/wp-login.php");
                 <div class="clear10"></div>
                
                <form method="post"  > 
+               <input type="hidden" name="bid" value="<?php echo $_GET['bid']; ?>">
                 
                <input type="submit" name="yes" value="<?php _e("Yes, Mark Completed!",'ProjectTheme'); ?>" />
                <input type="submit" name="no"  value="<?php _e("No",'ProjectTheme'); ?>" />

@@ -71,7 +71,7 @@
 		update_option('ProjectTheme_bid_project_owner_email_message', 'Hello ##username##,'.PHP_EOL.PHP_EOL.
 																				'You have received a new bid to your project <a href="##project_link##"><b>##project_name##</b></a>.'.PHP_EOL.
 																				'See your bid details below:'.PHP_EOL.PHP_EOL.
-																				'Bidder Username: ##bidder_username##'.PHP_EOL.
+																				'Bidder: ##bidder_username##'.PHP_EOL.
 																				'Bid Value: ##bid_value##'.PHP_EOL.PHP_EOL.																				
 																				'Thank you,'.PHP_EOL.
 																				'##your_site_name## Team');
@@ -83,7 +83,7 @@
 		update_option('ProjectTheme_bid_project_bidder_email_message', 'Hello ##username##,'.PHP_EOL.PHP_EOL.
 																				'You posted a new bid to the project <a href="##project_link##"><b>##project_name##</b></a>.'.PHP_EOL.
 																				'See your bid details below:'.PHP_EOL.PHP_EOL.
-																				'Project Link: ##project_link##'.PHP_EOL.
+																				'Project Link: <a href="##project_link##">##project_link##</a>'.PHP_EOL.
 																				'Bid Value: ##bid_value##'.PHP_EOL.PHP_EOL.																				
 																				'Thank you,'.PHP_EOL.
 																				'##your_site_name## Team');
@@ -114,19 +114,19 @@
 																				'##your_site_name## Team');*/
 		update_option('ProjectTheme_won_project_winner_email_subject', 'You bid for the project ##project_name## has been selected');
 		update_option('ProjectTheme_won_project_winner_email_message', 'Hello ##username##,'.PHP_EOL.PHP_EOL.
-																				'Your bid of <b>$##winner_bid_value##</b> has been selected as a winner for the project <b>##project_name##</b>, has been selected as a winner.'.PHP_EOL.PHP_EOL.
+																				'Your bid of <b>##winner_bid_value##</b> has been selected as a winner for the project <b>##project_title##</b>, has been selected as a winner.'.PHP_EOL.PHP_EOL.
 																				'Please see the details below:'.PHP_EOL.PHP_EOL.
 
 																				'Project Name: ##project_name##'.PHP_EOL.
-																				'Your Bid: $##winner_bid_value##'.PHP_EOL.
-																				'Click <a href="##project_link##"><b>here</b></a> to view the project!'.PHP_EOL.			
+																				'Your Bid: ##winner_bid_value##'.PHP_EOL.PHP_EOL.
+																				'Next step for you: go to <a href="##my_account_url##">your account</a>, and contact project ownser from <a href="##messenger_link##">private messenger</a> to get more nformations.'.PHP_EOL.PHP_EOL.			
 																				'Thank you,'.PHP_EOL.
 																				'##your_site_name## Team');
 		//--------------------------------------------------------------------------------------------------------------
 		
 		update_option('ProjectTheme_won_project_owner_email_subject', 'Your have selected a winner for your project: ##project_name##.');
 		update_option('ProjectTheme_won_project_owner_email_message', 'Hello ##username##,'.PHP_EOL.PHP_EOL.
-																				'Your project: <a href="##project_link##"><b>##project_name##</b></a> 
+																				'Your project: ##project_title## 
 																				has ended.'.PHP_EOL.
 																				'You just selected a winner for it. 
 																				See won project details below:'.PHP_EOL.PHP_EOL.
@@ -177,6 +177,31 @@
 		update_option('ProjectTheme_completed_project_bidder_email_message', 'Hello ##username##,'.PHP_EOL.PHP_EOL.
 																				'You have just marked the following project as completed: <b>##project_name##</b> ( ##project_link## )'.PHP_EOL.
 																				'You will be notified when the project owner will accept your project.'.PHP_EOL.PHP_EOL.
+																					
+																				'Thank you,'.PHP_EOL.
+																				'##your_site_name## Team');
+		//--------------------------------------------------------------------------------------------------------------																	
+		
+		update_option('ProjectTheme_in_progress_project_bidder_email_subject', 'Project marked as in progress by provider: ##project_name##.');
+		update_option('ProjectTheme_in_progress_project_bidder_email_message', 'Hello ##username##,'.PHP_EOL.PHP_EOL.
+																				'The provider of this project has marked it as still in progress.'.PHP_EOL.PHP_EOL.
+																				'Reason:'.PHP_EOL.
+                                                                                '##reason##'.PHP_EOL.PHP_EOL.
+																				'Project link: ##project_link##'.PHP_EOL.PHP_EOL.
+																					
+																				'Thank you,'.PHP_EOL.
+																				'##your_site_name## Team');
+																				
+		//--------------------------------------------------------------------------------------------------------------																	
+		
+		update_option('ProjectTheme_in_progress_project_owner_email_subject', 'You have marked your project as still in progress: ##project_name##.');
+		update_option('ProjectTheme_in_progress_project_owner_email_message', 'Hello ##username##,'.PHP_EOL.PHP_EOL.
+																				'You have just marked the following project as still in progress: <b>##project_name##</b>'.PHP_EOL.
+																				'You will be notified when the project owner will accept your project.'.PHP_EOL.PHP_EOL.
+                                                                                'Reason:'.PHP_EOL.
+                                                                                '##reason##'.PHP_EOL.PHP_EOL.
+																				'Project link: ##project_link##'.PHP_EOL.
+																				'Bidder: ##bidder_link##'.PHP_EOL.
 																					
 																				'Thank you,'.PHP_EOL.
 																				'##your_site_name## Team');

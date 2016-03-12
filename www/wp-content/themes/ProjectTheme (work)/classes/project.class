@@ -1,0 +1,85 @@
+<?php
+
+class Project {
+    
+    
+    public static function update_postmeta($pid, $meta) {
+        
+        switch ($meta) {
+            case 'delivered':
+                $all_project_bid = Bid::get_field_by_pid($pid, 'id', $single = false, array('winner=1') );
+                $array_deliver_bid = Bid::get_field_by_pid($pid, $meta, $single = false, array('winner=1') );
+                
+                if (in_array('0', $array_deliver_bid) || $all_project_bid > $array_deliver_bid) {
+                    update_post_meta($pid, 'delivered', "0");
+                } else {
+                    update_post_meta($pid, 'delivered', "1");
+                }
+                
+                break;
+                
+            case 'outstanding':
+                $all_project_bid = Bid::get_field_by_pid($pid, 'id', $single = false, array('winner=1') );
+                $array_outstanding_bid = Bid::get_field_by_pid($pid, $meta, $single = false, array('winner=1') );
+                
+                if (in_array('1', $array_outstanding_bid) || count($all_project_bid) > count($array_outstanding_bid)) {
+                    update_post_meta($pid, 'outstanding', "1");
+                } else {
+                    update_post_meta($pid, 'outstanding', "0");
+                }
+                
+                break;
+                
+                
+            case 'mark_coder_delivered':
+                $all_project_bid = Bid::get_field_by_pid($pid, 'id', $single = false, array('winner=1') );
+                $array_deliver_bid = Bid::get_field_by_pid($pid, 'mark_coder_delivered', $single = false, array('winner=1') );
+                
+                if (in_array('0', $array_deliver_bid) || count($all_project_bid) > count($array_deliver_bid)) {
+                    update_post_meta($pid, 'mark_coder_delivered', "0");
+                    update_post_meta($pid, 'mark_coder_delivered_date', "0");
+                } else {
+                    $tm = current_time('timestamp',0);
+                    update_post_meta($pid, 'mark_coder_delivered', "1");
+                    update_post_meta($pid, 'mark_coder_delivered_date', $tm);
+                }
+                
+                break;
+                
+            case 'mark_seller_accepted':
+                $all_project_bid = Bid::get_field_by_pid($pid, 'id', $single = false, array('winner=1') );
+                $array_seller_bid = Bid::get_field_by_pid($pid, 'mark_seller_accepted', $single = false, array('winner=1') );
+                
+                if (in_array('0', $array_seller_bid) || count($all_project_bid) > count($array_seller_bid)) {
+                    update_post_meta($pid, 'mark_seller_accepted', "0");
+                    update_post_meta($pid, 'mark_seller_accepted_date', "0");
+                } else {
+                    $tm = current_time('timestamp',0);
+                    update_post_meta($pid, 'mark_seller_accepted', "1");
+                    update_post_meta($pid, 'mark_seller_accepted_date', $tm);
+                }
+                
+                break;
+                
+            case 'paid_user':
+                $all_project_bid = Bid::get_field_by_pid($pid, 'id', $single = false, array('winner=1') );
+                $array_bid_paided = Bid::get_field_by_pid($pid, 'paid', $single = false, array('winner=1') );
+                
+                if (in_array('0', $array_bid_paided) || count($all_project_bid) > count($array_bid_paided)) {
+                    update_post_meta($pid, 'paid_user', "0");
+                    update_post_meta($pid, 'paid_user_date', "0");
+                } else {
+                    $tm = current_time('timestamp',0);
+                    update_post_meta($pid, 'paid_user', "1");
+                    update_post_meta($pid, 'paid_user_date', $tm);
+                }
+                
+                break;
+
+            default:
+                break;
+        }
+    }       
+    
+}
+
