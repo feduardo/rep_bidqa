@@ -6385,34 +6385,30 @@ function ProjectTheme_get_users_links()
 
 
 
-				$querystr = "
-
-					SELECT distinct wposts.ID 
-
-					FROM $wpdb->posts wposts, $wpdb->postmeta wpostmeta3, $wpdb->postmeta wpostmeta4
-
-					WHERE	
-
-					
-
-					
-
-					
-
-					wposts.ID = wpostmeta4.post_id AND
-
-					wpostmeta4.meta_key='paid_user' AND wpostmeta4.meta_value='1' 
-
-					
-
-					AND wposts.post_type = 'project' AND wposts.post_author='$uid'";
-
+//				$querystr = "
+//
+//					SELECT distinct wposts.ID 
+//
+//					FROM $wpdb->posts wposts, $wpdb->postmeta wpostmeta3, $wpdb->postmeta wpostmeta4
+//
+//					WHERE	
+//
+//					wposts.ID = wpostmeta4.post_id AND
+//
+//					wpostmeta4.meta_key='paid_user' AND wpostmeta4.meta_value='1' 
+//
+//					AND wposts.post_type = 'project' AND wposts.post_author='$uid'";
+                $querystr = "
+                        SELECT pb.ID 
+                        FROM $wpdb->posts AS p
+                        LEFT JOIN {$wpdb->prefix}project_bids AS pb ON p.ID = pb.pid
+                        WHERE   p.post_author = '$uid'
+                            AND pb.winner = '1'
+                            AND pb.paid = '1'
+                            AND p.post_type = 'project' ";
 				
 
 				 $pageposts = $wpdb->get_results($querystr, OBJECT);
-
-				
-
 				
 
 					$paid = count($pageposts);
@@ -6514,42 +6510,29 @@ function ProjectTheme_get_users_links()
 			
 
 				$querystr = "
-
-					SELECT distinct wposts.ID 
-
-					FROM $wpdb->posts wposts, $wpdb->postmeta wpostmeta2, $wpdb->postmeta wpostmeta3
-
-					WHERE wposts.ID = wpostmeta2.post_id AND
-
-					wpostmeta2.meta_key='winner' AND wpostmeta2.meta_value='$uid' AND
-
-					
-
-					
-
-					wposts.ID = wpostmeta3.post_id AND
-
-					wpostmeta3.meta_key='outstanding' AND wpostmeta3.meta_value='1' 
-
-					
-
-					AND wposts.post_type = 'project' AND wposts.post_status = 'publish' ";
-
-				
+					SELECT p.ID
+                    FROM $wpdb->posts AS p
+                    LEFT JOIN {$wpdb->prefix}project_bids AS b ON p.ID = b.pid
+                    LEFT JOIN {$wpdb->prefix}postmeta AS wpostmeta2 ON p.ID = wpostmeta2.post_id
+                    LEFT JOIN {$wpdb->prefix}postmeta AS wpostmeta3 ON p.ID = wpostmeta3.post_id
+                    WHERE 
+                    b.uid = '916' AND b.outstanding = '1'
+                    AND wpostmeta2.meta_key='winner' AND wpostmeta2.meta_value='916'
+                    AND wpostmeta3.meta_key='outstanding' AND wpostmeta3.meta_value='1' 
+                    AND p.post_type = 'project' AND p.post_status = 'publish' ";
 
 				 $pageposts = $wpdb->get_results($querystr, OBJECT);
 
 			
-
-			
-
 					$outsnr = count($pageposts);
 
 					
 
 				if($outsnr > 0)
 
-					$outsnr = "<span class='notif_a'>".$outsnr."</span>"; else $outsnr = '';
+					$outsnr = "<span class='notif_a'>".$outsnr."</span>"; 
+                
+                else $outsnr = '';
 
 					
 
@@ -6557,93 +6540,87 @@ function ProjectTheme_get_users_links()
 
 					
 
-					$querystr = "
-
-					SELECT distinct wposts.ID 
-
-					FROM $wpdb->posts wposts, $wpdb->postmeta wpostmeta2, $wpdb->postmeta wpostmeta3, $wpdb->postmeta wpostmeta4
-
-					WHERE wposts.ID = wpostmeta2.post_id AND
-
-					wpostmeta2.meta_key='winner' AND wpostmeta2.meta_value='$uid' AND
-
-					
-
-					
-
-					wposts.ID = wpostmeta3.post_id AND
-
-					wpostmeta3.meta_key='delivered' AND wpostmeta3.meta_value='1' AND
-
-					
-
-					wposts.ID = wpostmeta4.post_id AND
-
-					wpostmeta4.meta_key='paid_user' AND wpostmeta4.meta_value='0' 
-
-					
-
-					AND wposts.post_type = 'project' ";
-
-				
+//					$querystr = "
+//
+//					SELECT distinct wposts.ID 
+//
+//					FROM $wpdb->posts wposts, $wpdb->postmeta wpostmeta2, $wpdb->postmeta wpostmeta3, $wpdb->postmeta wpostmeta4
+//
+//					WHERE wposts.ID = wpostmeta2.post_id AND
+//
+//					wpostmeta2.meta_key='winner' AND wpostmeta2.meta_value='$uid' AND
+//
+//					
+//
+//					
+//
+//					wposts.ID = wpostmeta3.post_id AND
+//
+//					wpostmeta3.meta_key='delivered' AND wpostmeta3.meta_value='1' AND
+//
+//					
+//
+//					wposts.ID = wpostmeta4.post_id AND
+//
+//					wpostmeta4.meta_key='paid_user' AND wpostmeta4.meta_value='0' 
+//
+//					
+//
+//					AND wposts.post_type = 'project' ";
+                
+                $querystr = "
+                        SELECT distinct p.ID 
+                        FROM $wpdb->posts AS p
+                        LEFT JOIN {$wpdb->prefix}project_bids AS pb ON p.ID = pb.pid
+                        WHERE   pb.uid = '$uid'
+                            AND pb.winner = '1'
+                            AND pb.paid = '0'
+                            AND pb.delivered = '1'
+                            AND p.post_type = 'project' ";
 
 				 $pageposts = $wpdb->get_results($querystr, OBJECT);
 
-			
-
-			
-
 					$awnr = count($pageposts);
-
-					
 
 				if($awnr > 0)
 
 					$awnr = "<span class='notif_a'>".$awnr."</span>"; else $awnr = '';
 
+//				$querystr = "
+//
+//					SELECT distinct wposts.ID 
+//
+//					FROM $wpdb->posts wposts, $wpdb->postmeta wpostmeta2, $wpdb->postmeta wpostmeta3, $wpdb->postmeta wpostmeta4
+//
+//					WHERE wposts.ID = wpostmeta2.post_id AND
+//
+//					wpostmeta2.meta_key='winner' AND wpostmeta2.meta_value='$uid' AND
+//
+//					
+//					wposts.ID = wpostmeta3.post_id AND
+//
+//					wpostmeta3.meta_key='delivered' AND wpostmeta3.meta_value='1' AND
+//					
+//
+//					wposts.ID = wpostmeta4.post_id AND
+//
+//					wpostmeta4.meta_key='paid_user' AND wpostmeta4.meta_value='1' 
+//
+//					AND wposts.post_type = 'project' ";
 
-
-
-
-				$querystr = "
-
-					SELECT distinct wposts.ID 
-
-					FROM $wpdb->posts wposts, $wpdb->postmeta wpostmeta2, $wpdb->postmeta wpostmeta3, $wpdb->postmeta wpostmeta4
-
-					WHERE wposts.ID = wpostmeta2.post_id AND
-
-					wpostmeta2.meta_key='winner' AND wpostmeta2.meta_value='$uid' AND
-
-					
-
-					
-
-					wposts.ID = wpostmeta3.post_id AND
-
-					wpostmeta3.meta_key='delivered' AND wpostmeta3.meta_value='1' AND
-
-					
-
-					wposts.ID = wpostmeta4.post_id AND
-
-					wpostmeta4.meta_key='paid_user' AND wpostmeta4.meta_value='1' 
-
-					
-
-					AND wposts.post_type = 'project' ";
-
+                $querystr = "
+                        SELECT distinct p.ID 
+                        FROM $wpdb->posts AS p
+                        LEFT JOIN {$wpdb->prefix}project_bids AS pb ON p.ID = pb.pid
+                        WHERE   pb.uid = '$uid'
+                            AND pb.winner = '1'
+                            AND pb.paid = '1'
+                            AND pb.delivered = '1'
+                            AND p.post_type = 'project' ";
 				
-
 				 $pageposts = $wpdb->get_results($querystr, OBJECT);
 
-			
-
-			
-
 					$deliv = count($pageposts);
-
-					
 
 				if($deliv > 0)
 
@@ -10780,7 +10757,7 @@ function projectTheme_get_post_main_function ( $arr = '')
 
             global $wpdb;
             
-            
+            $hide_users = '';
 
             $providersResult = $wpdb->get_results('select * FROM wp_users inner JOIN wp_postmeta on wp_users.ID = wp_postmeta.meta_value where wp_postmeta.meta_key="winner" and wp_postmeta.post_id='.$pid);
 
@@ -10791,7 +10768,8 @@ function projectTheme_get_post_main_function ( $arr = '')
                         unset($providersResult[$key]);
                     }
                 }
-
+                
+                $hide_users = ' hidden ';
             }		
 
             		if($providersResult){            			
@@ -10812,7 +10790,7 @@ function projectTheme_get_post_main_function ( $arr = '')
                         ?>
                             <table class="table-condensed table-hover">
                             <tr>
-                                <th class="bold_stuff"><?php _e('Current QA Engineer','ThemeProject'); ?></th>
+                                <th class="bold_stuff" <?=$hide_users?>><?php _e('Current QA Engineer','ThemeProject'); ?></th>
                                 <th class="bold_stuff center"><?php _e('Time work','ThemeProject'); ?></th>
                                 <th class="bold_stuff center"><?php _e('Bid status','ThemeProject'); ?></th>
                                 <th ></th>
@@ -10861,7 +10839,7 @@ function projectTheme_get_post_main_function ( $arr = '')
             
             
                             <tr>
-                                <td><?php echo '<a href="'.ProjectTheme_get_user_profile_link($user_info->ID).'">' . $user_info->user_login .'</a>'; ?></td>
+                                <td <?=$hide_users?>><?php echo '<a href="'.ProjectTheme_get_user_profile_link($user_info->ID).'">' . $user_info->user_login .'</a>'; ?></td>
                                 <td class="center"><span>(<?php echo $str_time;?>)</span></td>
                                 <td class="center"><?php echo $status['name']; ?></td>
                                 <td></td>
@@ -12223,7 +12201,7 @@ function projectTheme_get_post_acc()
 
 {
 
-		$pid = get_the_ID();
+	$pid = get_the_ID();
 
 	global $post, $current_user;
 
@@ -12550,6 +12528,17 @@ function projectTheme_get_post_acc()
 }}
 
 function ProjectTheme_get_buttons_my_deliv_2 (){
+    
+    $pid = get_the_ID();
+
+	global $post, $current_user;
+
+	get_currentuserinfo();
+
+	$post = get_post($pid);
+
+	$uid = $current_user->ID;
+    
     ?>
     <div class="my-deliv_2">
 
@@ -12596,10 +12585,6 @@ function ProjectTheme_get_buttons_my_deliv_2 (){
                   <?php endif; ?>
 
                   
-
-                  
-
-                
 
                   
 
@@ -12736,7 +12721,8 @@ function projectTheme_get_post_outstanding_project_function()
 
 	  	
 
-		$bid = projectTheme_get_bid_by_uid($pid, $current_user->ID); 
+//		$bid = projectTheme_get_bid_by_uid($pid, $current_user->ID); 
+		$bid = Bid::get_by_pid_uid($pid, $current_user->ID, true); 
         
         $mark_coder_delivered = Bid::get_field_by_id($bid->id, 'mark_coder_delivered', $single = true);
 
@@ -12964,7 +12950,7 @@ function projectTheme_get_post_outstanding_project_function()
 
             	<div class="my-deliv_1"><?php _e('After finishing the work on the project, you can mark it as <em><strong>delivered</strong></em>','ProjectTheme') ?></div>
 
-                	<? endif; ?>
+                	<?php endif; ?>
 
                 <div class="my-deliv_2">
 
@@ -13579,8 +13565,8 @@ function projectTheme_get_post_paid_function( $arr = '')
 
 			$post				= get_post(get_the_ID());
 
-
-
+            
+            
 			
 
 			global $current_user;
@@ -13588,8 +13574,13 @@ function projectTheme_get_post_paid_function( $arr = '')
 			get_currentuserinfo();
 
 			$uid = $current_user->ID;
+            
+            $bids = Bid::get_by_pid_uid($post->ID, '', $single = false, $filters = array('winner=1', 'paid=1'));
 
-			
+			foreach ($bids as $bid) {
+
+
+
 
 ?>
 
@@ -13721,7 +13712,8 @@ function projectTheme_get_post_paid_function( $arr = '')
 
 		
 
-			$paid_user_date = get_post_meta(get_the_ID(), 'paid_user_date', true);
+//			$paid_user_date = get_post_meta(get_the_ID(), 'paid_user_date', true);
+			$paid_user_date = $bid->paid_user_date;
 
 			if(!empty($paid_user_date)) $sk = date_i18n('d-m-Y H:i:s',$paid_user_date);
 
@@ -13793,7 +13785,7 @@ function projectTheme_get_post_paid_function( $arr = '')
 
 								
 
-								$bid = projectTheme_get_winner_bid(get_the_ID());
+//								$bid = projectTheme_get_winner_bid(get_the_ID());
 
 								echo ProjectTheme_get_show_price($bid->bid);
 
@@ -13825,7 +13817,8 @@ function projectTheme_get_post_paid_function( $arr = '')
 
 								
 
-								$winner = get_post_meta(get_the_ID(), 'winner', true);
+//								$winner = get_post_meta(get_the_ID(), 'winner', true);
+								$winner = $bid->uid;
 
 								$winner = get_userdata($winner);
 
@@ -13858,7 +13851,7 @@ function projectTheme_get_post_paid_function( $arr = '')
                      </div></div></div>
 
 <?php
-
+            }
 }
 
 /*************************************************************

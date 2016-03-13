@@ -35,7 +35,8 @@ class Project {
                 $all_project_bid = Bid::get_field_by_pid($pid, 'id', $single = false, array('winner=1') );
                 $array_deliver_bid = Bid::get_field_by_pid($pid, 'mark_coder_delivered', $single = false, array('winner=1') );
                 
-                if (in_array('0', $array_deliver_bid) || count($all_project_bid) > count($array_deliver_bid)) {
+//                if (in_array('0', $array_deliver_bid) || count($all_project_bid) > count($array_deliver_bid)) {
+                if (!in_array('1', $array_deliver_bid)) {
                     update_post_meta($pid, 'mark_coder_delivered', "0");
                     update_post_meta($pid, 'mark_coder_delivered_date', "0");
                 } else {
@@ -47,18 +48,42 @@ class Project {
                 break;
                 
             case 'mark_seller_accepted':
-                $all_project_bid = Bid::get_field_by_pid($pid, 'id', $single = false, array('winner=1') );
+                $all_project_bid = Bid::get_by_pid_uid($pid, '', $single = false, array('winner=1') );
                 $array_seller_bid = Bid::get_field_by_pid($pid, 'mark_seller_accepted', $single = false, array('winner=1') );
                 
-                if (in_array('0', $array_seller_bid) || count($all_project_bid) > count($array_seller_bid)) {
+                $seller_accepted_all = get_post_meta($pid, 'mark_seller_accepted', true);
+                
+                $bool = true;
+                foreach ($all_project_bid as $bid) {
+                    if ($bid->mark_seller_accepted != $bid->mark_coder_delivered) {
+                        $bool = false;
+                        break;
+                    }
+                }
+                if ($bool) {
+                    update_post_meta($pid, 'mark_coder_delivered', "0");
+                    update_post_meta($pid, 'mark_coder_delivered_date', "0");
+                } else {
+                    $tm = current_time('timestamp',0);
+                    update_post_meta($pid, 'mark_coder_delivered', "1");
+                    update_post_meta($pid, 'mark_coder_delivered_date', $tm);
+                }
+                
+                                
+                if (in_array('0', $array_seller_bid)) {
+                    $seller_accepted_all = '0';
                     update_post_meta($pid, 'mark_seller_accepted', "0");
                     update_post_meta($pid, 'mark_seller_accepted_date', "0");
                 } else {
+                    $seller_accepted_all = '1';
                     $tm = current_time('timestamp',0);
                     update_post_meta($pid, 'mark_seller_accepted', "1");
                     update_post_meta($pid, 'mark_seller_accepted_date', $tm);
+                    update_post_meta($pid, 'mark_coder_delivered', "1");
                 }
+                                
                 
+                                
                 break;
                 
             case 'paid_user':

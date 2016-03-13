@@ -35,32 +35,49 @@ function ProjectTheme_my_account_delivered_projects_area_function()
 				$uid = $current_user->ID;
 				
 				
-				global $wp_query;
+				global $wp_query, $wpdb;
 				$query_vars = $wp_query->query_vars;
 				$post_per_page = 10;				
-				
+                
+                 $querystr = "
+                        SELECT distinct p.ID 
+                        FROM $wpdb->posts AS p
+                        LEFT JOIN {$wpdb->prefix}project_bids AS pb ON p.ID = pb.pid
+                        WHERE   pb.uid = '$uid'
+                            AND pb.winner = '1'
+                            AND pb.paid = '1'
+                            AND pb.delivered = '1'
+                            AND p.post_type = 'project' ";
+										 
+				$pageposts = $wpdb->get_col($querystr);
+                 
+                if (empty($pageposts)) {
+                    _e("There are no delivered projects yet.",'ProjectTheme');
+                } else {
 		
-				$outstanding = array(
-						'key' => 'delivered',
-						'value' => "1",
-						'compare' => '='
-					);
-					
-				
-				$paid_user = array(
-						'key' => 'paid_user',
-						'value' => "1",
-						'compare' => '='
-					);	
-					
-				$winner = array(
-						'key' => 'winner',
-						'value' => $uid,
-						'compare' => '='
-					);		
-				
+//				$outstanding = array(
+//						'key' => 'delivered',
+//						'value' => "1",
+//						'compare' => '='
+//					);
+//					
+//				
+//				$paid_user = array(
+//						'key' => 'paid_user',
+//						'value' => "1",
+//						'compare' => '='
+//					);	
+//					
+//				$winner = array(
+//						'key' => 'winner',
+//						'value' => $uid,
+//						'compare' => '='
+//					);		
+//				
+//				$args = array('post_type' => 'project', 'order' => 'DESC', 'orderby' => 'date', 'posts_per_page' => $post_per_page,
+//				'paged' => $query_vars['paged'], 'meta_query' => array($outstanding, $winner, $paid_user));
 				$args = array('post_type' => 'project', 'order' => 'DESC', 'orderby' => 'date', 'posts_per_page' => $post_per_page,
-				'paged' => $query_vars['paged'], 'meta_query' => array($outstanding, $winner, $paid_user));
+				'paged' => $query_vars['paged'], 'post__in' => $pageposts);
 				
 				query_posts($args);
 
@@ -79,7 +96,7 @@ function ProjectTheme_my_account_delivered_projects_area_function()
 				endif;
 				
 				wp_reset_query();
-				
+                }
 				?>
                 
                 

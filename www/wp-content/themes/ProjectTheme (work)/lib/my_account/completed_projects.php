@@ -30,19 +30,37 @@ function ProjectTheme_my_account_completed_projects_area_function()
 				get_currentuserinfo();
 				$uid = $current_user->ID;
 				
-				global $wp_query;
+				global $wp_query, $wpdb;
 				$query_vars = $wp_query->query_vars;
 				$post_per_page = 10;				
 				
-					
-				$paid = array(
-						'key' => 'paid_user',
-						'value' => "1",
-						'compare' => '='
-					);	
-				
+                $querystr = "
+                        SELECT p.ID 
+                        FROM $wpdb->posts AS p
+                        LEFT JOIN {$wpdb->prefix}project_bids AS pb ON p.ID = pb.pid
+                        WHERE   p.post_author = '$uid'
+                            AND pb.winner = '1'
+                            AND pb.paid = '1'
+                            AND p.post_type = 'project' ";
+                        
+                $pageposts = $wpdb->get_col($querystr);
+                 
+                if (empty($pageposts)) {    
+                    echo '<div class="my_box3 border_bottom_0"> <div class="box_content">   ';
+                    _e("There are no completed projects yet.",'ProjectTheme');
+                    echo '</div>  </div> ';
+                } else {
+                    
+//				$paid = array(
+//						'key' => 'paid_user',
+//						'value' => "1",
+//						'compare' => '='
+//					);	
+//				
+//				$args = array('post_type' => 'project','author' => $uid, 'order' => 'DESC', 'orderby' => 'date', 'posts_per_page' => $post_per_page,
+//				'paged' => $query_vars['paged'], 'meta_query' => array($paid));
 				$args = array('post_type' => 'project','author' => $uid, 'order' => 'DESC', 'orderby' => 'date', 'posts_per_page' => $post_per_page,
-				'paged' => $query_vars['paged'], 'meta_query' => array($paid));
+				'paged' => $query_vars['paged'], 'post__in' => $pageposts);
 				
 				query_posts( $args);
 
@@ -64,6 +82,7 @@ function ProjectTheme_my_account_completed_projects_area_function()
 				
 				wp_reset_query();
 				
+                }
 				?>
         
    

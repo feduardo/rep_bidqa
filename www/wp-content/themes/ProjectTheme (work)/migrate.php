@@ -7,6 +7,7 @@
 get_header();
 
 global $currentuser;
+get_currentuserinfo();
 
 if (!current_user_can('administrator') && !is_admin()) {
     echo 'please, login as admin';
